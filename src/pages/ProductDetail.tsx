@@ -61,27 +61,29 @@ export default function ProductDetail() {
             />
           </div>
 
-          <div className="space-y-4 px-1">
+          <div className="flex flex-col gap-4 mt-6 max-w-[400px] mx-auto w-full">
             <div>
-              <h1 className="text-xl font-bold text-card-foreground leading-snug">{product.title}</h1>
-              <p className="mt-1.5 text-2xl font-extrabold text-primary">{product.price}</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight leading-snug">{product.title}</h1>
+              <p className="mt-2 text-2xl font-extrabold text-primary">{product.price}</p>
             </div>
 
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {product.tags.map(tag => (
-                <span key={tag} className="rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
+                <span key={tag} className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground uppercase tracking-wider">
                   {tag}
                 </span>
               ))}
             </div>
 
-            <p className="text-sm leading-relaxed text-muted-foreground">{product.description}</p>
+            <div className="border-t border-border pt-5 mt-2">
+              <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{product.description}</p>
+            </div>
 
             <a
               href={checkoutUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 mt-2 text-lg font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
             >
               <CheckoutIcon type={product.checkout.type} />
               Beli Sekarang
