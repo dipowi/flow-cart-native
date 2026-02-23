@@ -25,7 +25,7 @@ export const products: Product[] = [
     price: "Rp 45.000",
     originalPrice: "Rp 65.000",
     discountPercentage: "30%",
-    image: "https://images.unsplash.com/photo-1596450514735-111a2fe02935?w=400&q=60",
+    image: "https://placehold.co/400x400/e2e8f0/64748b?text=Kurma",
     description: "Kurma premium pilihan, manis alami dan lembut. Cocok untuk hidangan keluarga.",
     tags: ["makanan", "kurma"],
     checkout: { type: "whatsapp", phone: "6281234567890", message: "Halo Cokotq, saya mau pesan Kurma Kurmanun 250gr." }
@@ -34,7 +34,7 @@ export const products: Product[] = [
     id: 2,
     title: "Template HPP WEB ID Pro",
     price: "Rp 150.000",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=60",
+    image: "https://placehold.co/400x400/e2e8f0/64748b?text=Template",
     description: "Platform PWA-based untuk manajemen bisnis modern. Solusi full-stack untuk UMKM.",
     tags: ["digital", "template"],
     checkout: { type: "telegram", username: "admin_store", message: "Halo, saya tertarik dengan Template HPP WEB ID." }
@@ -43,7 +43,7 @@ export const products: Product[] = [
     id: 3,
     title: "Layanan Konsultan Bisnis & Setup Web",
     price: "Rp 500.000",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=60",
+    image: "https://placehold.co/400x400/e2e8f0/64748b?text=Konsultan",
     description: "Sesi konsultasi 1-on-1 bersama Didin Prasetyawan, S.M. untuk optimasi target market Gen Z.",
     tags: ["jasa", "konsultan"],
     checkout: { type: "payment_gateway", url: "https://payment.gateway.com/link/123" }
@@ -52,7 +52,7 @@ export const products: Product[] = [
     id: 4,
     title: "Paket Produk Digital Gen Z",
     price: "Rp 99.000",
-    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=60",
+    image: "https://placehold.co/400x400/e2e8f0/64748b?text=Digital",
     description: "Kumpulan aset digital desain kekinian.",
     tags: ["digital", "gen-z"],
     checkout: { type: "whatsapp", phone: "6281234567890", message: "Halo, mau order Paket Digital Gen Z." }
