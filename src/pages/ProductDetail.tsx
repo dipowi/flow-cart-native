@@ -5,7 +5,7 @@ import { products, getCheckoutUrl, buildDiscoveryQueue } from "@/data/products";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 
 function CheckoutIcon({ type }: { type: string }) {
   switch (type) {
@@ -13,6 +13,24 @@ function CheckoutIcon({ type }: { type: string }) {
     case "telegram": return <Send className="h-5 w-5" />;
     default: return <ExternalLink className="h-5 w-5" />;
   }
+}
+
+function DetailImage({ src, alt }: { src: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="flex justify-center">
+      <div className="relative w-full max-w-[380px] aspect-square rounded-2xl overflow-hidden shadow-sm">
+        {!loaded && <div className="absolute inset-0 animate-pulse bg-muted" />}
+        <img
+          src={src}
+          alt={alt}
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          className={`h-full w-full object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default function ProductDetail() {
@@ -53,13 +71,7 @@ export default function ProductDetail() {
           transition={{ duration: 0.35 }}
           className="pt-6 space-y-4"
         >
-          <div className="flex justify-center">
-            <img
-              src={product.image}
-              alt={product.title}
-              className="w-full max-w-[380px] aspect-square object-cover rounded-2xl shadow-sm"
-            />
-          </div>
+          <DetailImage src={product.image} alt={product.title} />
 
           <div className="w-full mt-8 px-5 md:px-8 flex flex-col gap-5 text-left">
             <div>
