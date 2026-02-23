@@ -1,9 +1,8 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchProductCount, fetchProductById, fetchDiscoveryQueue, fetchStoreSettings, fetchProducts } from "@/data/products";
-import { useState, useCallback, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProductById, fetchDiscoveryQueue, fetchStoreSettings } from "@/data/products";
+import { useState, useCallback, useEffect } from "react";
 import type { Product } from "@/data/products";
-
-const PAGE_SIZE = 4;
+import { supabase } from "@/integrations/supabase/client";
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -14,92 +13,74 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-/**
- * True server-side pagination hook.
- * - First load fetches only 4 products (.range(0,3))
- * - Subsequent loads APPEND via .range(from, to)
- * - Never replaces existing items in state
- */
-/**
- * Pre-render shuffle: separates pinned from unpinned,
- * shuffles unpinned if random is enabled, then merges.
- * Data enters state already in final order — zero flicker.
- */
-function preRenderSort(products: Product[], isRandom: boolean): Product[] {
-  const pinned = products.filter(p => p.isPinned);
-  const unpinned = products.filter(p => !p.isPinned);
-  return [...pinned, ...(isRandom ? shuffleArray(unpinned) : unpinned)];
+function mapRow(row: any): Product {
+  const hasCustomCheckout = !!(row.checkout_type && row.checkout_target);
+  return {
+    id: row.id,
+    title: row.title,
+    price: row.price,
+    originalPrice: row.original_price,
+    discountPercentage: row.discount_percentage,
+    images: row.image_urls ?? [],
+    description: row.description,
+    tags: row.tags ?? [],
+    isPinned: row.is_pinned ?? false,
+    orderIndex: row.order_index ?? 0,
+    checkout: hasCustomCheckout
+      ? { type: row.checkout_type, target: row.checkout_target, message: row.checkout_message }
+      : null,
+  };
 }
 
+const CHUNK = 4;
+
+/**
+ * Master Array Slicing architecture:
+ * 1. Fetch ALL products + settings ONCE on mount
+ * 2. Sort pinned first, shuffle unpinned if random is on
+ * 3. Store in master array, never re-fetch or re-shuffle
+ * 4. Lazy load via array.slice(0, visibleCount)
+ */
 export function useProductFeed() {
-  const [items, setItems] = useState<Product[]>([]);
-  const [page, setPage] = useState(0);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const fetchingRef = useRef(false);
-  const isRandomRef = useRef(false);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [visibleCount, setVisibleCount] = useState(CHUNK);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const countQuery = useQuery({
-    queryKey: ["products-count"],
-    queryFn: fetchProductCount,
-    staleTime: 60_000,
-  });
+  useEffect(() => {
+    let cancelled = false;
 
-  // Fetch settings FIRST so we know if random is on before rendering products
-  const settingsQuery = useQuery({
-    queryKey: ["store-settings"],
-    queryFn: fetchStoreSettings,
-    staleTime: 60_000,
-  });
-
-  // Keep ref in sync so callbacks always see latest value
-  isRandomRef.current = settingsQuery.data?.isHomepageRandom ?? false;
-
-  // Initial load — waits for settings, then fetches & pre-shuffles
-  const initialQuery = useQuery({
-    queryKey: ["products-initial"],
-    queryFn: async () => {
-      const [data, settings] = await Promise.all([
-        fetchProducts(0, PAGE_SIZE - 1),
-        fetchStoreSettings(),
+    async function init() {
+      const [productsRes, settingsRes] = await Promise.all([
+        supabase.from("products").select("*").order("is_pinned", { ascending: false }).order("order_index", { ascending: true }),
+        supabase.from("store_settings").select("*").limit(1).maybeSingle(),
       ]);
-      const isRandom = settings?.isHomepageRandom ?? false;
-      isRandomRef.current = isRandom;
-      const sorted = preRenderSort(data, isRandom);
-      setItems(sorted);
-      setPage(1);
-      return sorted;
-    },
-    staleTime: 30_000,
-  });
 
-  const totalCount = countQuery.data ?? 0;
-  const hasMore = items.length < totalCount;
+      if (cancelled) return;
+      if (productsRes.error) throw productsRes.error;
 
-  const loadMore = useCallback(async () => {
-    if (fetchingRef.current || !hasMore) return;
-    fetchingRef.current = true;
-    setIsLoadingMore(true);
-    try {
-      const from = page * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
-      const newData = await fetchProducts(from, to);
-      // Pre-sort new batch, then APPEND — never replace
-      const sorted = preRenderSort(newData, isRandomRef.current);
-      setItems(prev => [...prev, ...sorted]);
-      setPage(prev => prev + 1);
-    } finally {
-      fetchingRef.current = false;
-      setIsLoadingMore(false);
+      const all = (productsRes.data ?? []).map(mapRow);
+      const isRandom = settingsRes.data?.is_homepage_random ?? false;
+
+      const pinned = all.filter(p => p.isPinned);
+      const unpinned = all.filter(p => !p.isPinned);
+      const finalArray = [...pinned, ...(isRandom ? shuffleArray(unpinned) : unpinned)];
+
+      setAllProducts(finalArray);
+      setIsLoading(false);
     }
-  }, [page, hasMore]);
 
-  return {
-    items,
-    hasMore,
-    loadMore,
-    isLoading: initialQuery.isLoading,
-    isLoadingMore,
-  };
+    init();
+    return () => { cancelled = true; };
+  }, []);
+
+  const items = allProducts.slice(0, visibleCount);
+  const hasMore = visibleCount < allProducts.length;
+
+  const loadMore = useCallback(() => {
+    setVisibleCount(prev => prev + CHUNK);
+  }, []);
+
+  return { items, hasMore, loadMore, isLoading, isLoadingMore: false };
 }
 
 export function useProduct(id: string | undefined) {
