@@ -64,15 +64,13 @@ export default function ProductDetail() {
           <div className="flex flex-col gap-4 mt-6 max-w-[400px] mx-auto w-full">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight leading-snug">{product.title}</h1>
-              <p className="mt-2 text-2xl font-extrabold text-primary">{product.price}</p>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {product.tags.map(tag => (
-                <span key={tag} className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground uppercase tracking-wider">
-                  {tag}
-                </span>
-              ))}
+              {product.originalPrice ? (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground font-medium line-through">{product.originalPrice}</span>
+                  <span className="text-[10px] md:text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">-{product.discountPercentage}</span>
+                </div>
+              ) : null}
+              <p className={`${product.originalPrice ? 'mt-1' : 'mt-2'} text-2xl font-extrabold text-primary`}>{product.price}</p>
             </div>
 
             <div className="border-t border-border pt-5 mt-2">

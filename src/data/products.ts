@@ -10,6 +10,8 @@ export interface Product {
   id: number;
   title: string;
   price: string;
+  originalPrice?: string;
+  discountPercentage?: string;
   image: string;
   description: string;
   tags: string[];
@@ -21,6 +23,8 @@ export const products: Product[] = [
     id: 1,
     title: "Kurma Kurmanun Premium 250gr",
     price: "Rp 45.000",
+    originalPrice: "Rp 65.000",
+    discountPercentage: "30%",
     image: "https://images.unsplash.com/photo-1596450514735-111a2fe02935?w=800&q=80",
     description: "Kurma premium pilihan, manis alami dan lembut. Cocok untuk hidangan keluarga.",
     tags: ["makanan", "kurma"],
@@ -66,6 +70,8 @@ export const products: Product[] = [
     id: 6,
     title: "Jam Tangan Retro Casio A168 (Pre-loved)",
     price: "Rp 300.000",
+    originalPrice: "Rp 450.000",
+    discountPercentage: "33%",
     image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=800&q=80",
     description: "Kondisi mulus, akurat, gaya klasik abadi.",
     tags: ["aksesoris", "fashion"],
