@@ -5,7 +5,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Store } from "lucide-react";
 
 export default function Index() {
-  const { visibleItems, isLoading, hasMore, sentinelRef } = useInfiniteScroll(products, 4);
+  const { visibleItems, hasMore, sentinelRef } = useInfiniteScroll(products, 4);
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,15 +29,10 @@ export default function Index() {
             <ProductCard key={product.id} product={product} index={i} />
           ))}
 
-          {isLoading && (
-            <div className="col-span-2 w-full flex justify-center items-center py-6">
-              <LoadingSpinner />
-            </div>
-          )}
 
           {hasMore && <div ref={sentinelRef} className="col-span-2 h-1" />}
 
-          {!hasMore && !isLoading && (
+          {!hasMore && (
             <p className="col-span-2 w-full py-8 text-center text-sm text-muted-foreground mx-auto">
               Semua produk sudah ditampilkan ✨
             </p>
