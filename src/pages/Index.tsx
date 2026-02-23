@@ -5,7 +5,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Store } from "lucide-react";
 
 export default function Index() {
-  const { visibleItems, isLoading, hasMore, sentinelRef } = useInfiniteScroll(products, 5);
+  const { visibleItems, isLoading, hasMore, sentinelRef } = useInfiniteScroll(products, 4);
 
   return (
     <div className="min-h-screen bg-background">

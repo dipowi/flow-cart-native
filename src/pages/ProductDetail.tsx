@@ -24,11 +24,11 @@ export default function ProductDetail() {
   }, [id]);
 
   const related = useMemo(
-    () => (product ? getRelatedProducts(product.id, 5) : []),
+    () => (product ? getRelatedProducts(product.id, 8) : []),
     [product]
   );
 
-  const { visibleItems, isLoading, hasMore, sentinelRef } = useInfiniteScroll(related, 5);
+  const { visibleItems, isLoading, hasMore, sentinelRef } = useInfiniteScroll(related, 4);
 
   if (!product) {
     return (
