@@ -1,15 +1,15 @@
-import { useState, useRef, useCallback, useEffect, type SyntheticEvent } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { OptimizedImage } from "./OptimizedImage";
 
 interface ImageCarouselProps {
   images: string[];
   alt: string;
   className?: string;
+  priority?: boolean;
 }
 
-export default function ImageCarousel({ images, alt, className = "" }: ImageCarouselProps) {
+export default function ImageCarousel({ images, alt, className = "", priority = false }: ImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [loadedSet, setLoadedSet] = useState<Set<number>>(new Set());
-  const [errorSet, setErrorSet] = useState<Set<number>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
@@ -21,26 +21,8 @@ export default function ImageCarousel({ images, alt, className = "" }: ImageCaro
 
   useEffect(() => {
     setActiveIndex(0);
-    setLoadedSet(new Set());
-    setErrorSet(new Set());
     if (scrollRef.current) scrollRef.current.scrollLeft = 0;
   }, [images]);
-
-  const markLoaded = useCallback((i: number) => {
-    setLoadedSet(prev => { const next = new Set(prev); next.add(i); return next; });
-  }, []);
-
-  const markError = useCallback((i: number) => {
-    setErrorSet(prev => { const next = new Set(prev); next.add(i); return next; });
-  }, []);
-
-  const Placeholder = () => (
-    <div className="absolute inset-0 rounded-2xl bg-muted flex items-center justify-center">
-      <span className="text-muted-foreground font-medium tracking-widest text-sm uppercase">
-        IMAGE
-      </span>
-    </div>
-  );
 
   if (!images || images.length === 0) {
     return (
@@ -53,26 +35,13 @@ export default function ImageCarousel({ images, alt, className = "" }: ImageCaro
   }
 
   if (images.length === 1) {
-    if (errorSet.has(0)) {
-      return (
-        <div className={`relative aspect-square overflow-hidden rounded-2xl ${className}`}>
-          <Placeholder />
-        </div>
-      );
-    }
     return (
-      <div className={`relative aspect-square overflow-hidden rounded-2xl bg-muted ${className}`}>
-        {!loadedSet.has(0) && <div className="absolute inset-0 animate-pulse bg-muted" />}
-        <img
-          src={images[0]}
-          alt={alt}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => markLoaded(0)}
-          onError={() => markError(0)}
-          className={`h-full w-full object-cover transition-opacity duration-300 ${loadedSet.has(0) ? "opacity-100" : "opacity-0"}`}
-        />
-      </div>
+      <OptimizedImage
+        src={images[0]}
+        alt={alt}
+        priority={priority}
+        className={`aspect-square rounded-2xl ${className}`}
+      />
     );
   }
 
@@ -85,27 +54,16 @@ export default function ImageCarousel({ images, alt, className = "" }: ImageCaro
         style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
       >
         {images.map((src, i) => (
-          <div key={i} className="min-w-full snap-center aspect-square bg-muted relative flex-shrink-0">
-            {errorSet.has(i) ? (
-              <Placeholder />
-            ) : (
-              <>
-                {!loadedSet.has(i) && <div className="absolute inset-0 animate-pulse bg-muted" />}
-                <img
-                  src={src}
-                  alt={`${alt} ${i + 1}`}
-                  loading={i === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                  onLoad={() => markLoaded(i)}
-                  onError={() => markError(i)}
-                  className={`h-full w-full object-cover transition-opacity duration-300 ${loadedSet.has(i) ? "opacity-100" : "opacity-0"}`}
-                />
-              </>
-            )}
+          <div key={i} className="min-w-full snap-center flex-shrink-0">
+            <OptimizedImage
+              src={src}
+              alt={`${alt} ${i + 1}`}
+              priority={priority && i === 0}
+              className="aspect-square"
+            />
           </div>
         ))}
       </div>
-      {/* iOS-style dots */}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
         {images.map((_, i) => (
           <div

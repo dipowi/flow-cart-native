@@ -58,7 +58,7 @@ export default function ProductDetail() {
         <article className="pt-6 space-y-4">
           <div className="flex justify-center">
             <div className="w-full max-w-[380px]">
-              <ImageCarousel images={product.images} alt={product.title} className="shadow-sm" />
+              <ImageCarousel images={product.images} alt={product.title} className="shadow-sm" priority={true} />
             </div>
           </div>
 
