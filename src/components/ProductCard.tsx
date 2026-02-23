@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Product } from "@/data/products";
 
@@ -7,21 +7,23 @@ interface ProductCardProps {
   index: number;
 }
 
-export default function ProductCard({ product, index }: ProductCardProps) {
+function ProductCardInner({ product, index }: ProductCardProps) {
+  const [loaded, setLoaded] = useState(false);
+
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.06, ease: "easeOut" }}
-      className="overflow-hidden rounded-2xl bg-card card-shadow"
-    >
+    <article className="overflow-hidden rounded-2xl bg-card card-shadow">
       <Link to={`/product/${product.id}`} className="block">
-        <div className="aspect-square overflow-hidden">
+        <div className="aspect-square overflow-hidden relative">
+          {!loaded && (
+            <div className="absolute inset-0 animate-pulse bg-muted rounded-t-2xl" />
+          )}
           <img
             src={product.image}
             alt={product.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+            decoding="async"
+            onLoad={() => setLoaded(true)}
+            className={`h-full w-full object-cover transition-transform duration-500 hover:scale-105 ${loaded ? "opacity-100" : "opacity-0"}`}
           />
         </div>
 
@@ -38,6 +40,9 @@ export default function ProductCard({ product, index }: ProductCardProps) {
           <p className="text-base font-bold text-primary">{product.price}</p>
         </div>
       </Link>
-    </motion.article>
+    </article>
   );
 }
+
+const ProductCard = memo(ProductCardInner);
+export default ProductCard;
