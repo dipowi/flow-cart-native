@@ -10,6 +10,7 @@ export interface StoreSettings {
 
 export interface Product {
   id: string;
+  slug: string;
   title: string;
   price: string;
   originalPrice?: string | null;
@@ -31,6 +32,7 @@ function mapRow(row: any): Product {
   const hasCustomCheckout = !!(row.checkout_type && row.checkout_target);
   return {
     id: row.id,
+    slug: row.slug ?? "",
     title: row.title,
     price: row.price,
     originalPrice: row.original_price,
@@ -68,6 +70,17 @@ export async function fetchProductById(id: string): Promise<Product | null> {
     .from("products")
     .select("*")
     .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapRow(data) : null;
+}
+
+/** Fetch a single product by slug */
+export async function fetchProductBySlug(slug: string): Promise<Product | null> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
   return data ? mapRow(data) : null;

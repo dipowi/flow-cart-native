@@ -11,8 +11,9 @@ interface ProductCardProps {
 function ProductCardInner({ product }: ProductCardProps) {
   return (
     <article className="overflow-hidden rounded-2xl bg-card card-shadow">
-      <Link to={`/product/${product.id}`} state={{ product }} className="block">
+      <Link to={`/p/${product.slug}`} state={{ product }} className="block">
         <ImageCarousel images={product.images} alt={product.title} />
+
         <div className="p-3 space-y-1">
           <div className="min-h-[2.75rem]">
             <h3 className="text-sm font-semibold leading-snug text-card-foreground line-clamp-2">
