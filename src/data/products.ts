@@ -5,6 +5,7 @@ export interface StoreSettings {
   globalCheckoutType: "whatsapp" | "telegram" | "link";
   globalCheckoutTarget: string;
   globalCheckoutMessage: string | null;
+  isHomepageRandom: boolean;
 }
 
 export interface Product {
@@ -16,11 +17,13 @@ export interface Product {
   images: string[];
   description: string;
   tags: string[];
+  isPinned: boolean;
+  orderIndex: number;
   checkout: {
     type: "whatsapp" | "telegram" | "link";
     target: string;
     message?: string | null;
-  } | null; // null = use global settings
+  } | null;
 }
 
 /** Map a DB row to our frontend Product shape */
@@ -35,6 +38,8 @@ function mapRow(row: any): Product {
     images: row.image_urls ?? [],
     description: row.description,
     tags: row.tags ?? [],
+    isPinned: row.is_pinned ?? false,
+    orderIndex: row.order_index ?? 0,
     checkout: hasCustomCheckout
       ? {
           type: row.checkout_type as "whatsapp" | "telegram" | "link",
@@ -50,7 +55,8 @@ export async function fetchProducts(from: number, to: number): Promise<Product[]
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .order("sort_order", { ascending: true })
+    .order("is_pinned", { ascending: false })
+    .order("order_index", { ascending: true })
     .range(from, to);
   if (error) throw error;
   return (data ?? []).map(mapRow);
@@ -83,7 +89,8 @@ export async function fetchRelatedProducts(currentId: string, tags: string[]): P
     .select("*")
     .neq("id", currentId)
     .overlaps("tags", tags)
-    .order("sort_order", { ascending: true })
+    .order("is_pinned", { ascending: false })
+    .order("order_index", { ascending: true })
     .limit(8);
   if (error) throw error;
   return (data ?? []).map(mapRow);
@@ -95,7 +102,8 @@ export async function fetchDiscoveryQueue(currentId: string, tags: string[]): Pr
     .from("products")
     .select("*")
     .neq("id", currentId)
-    .order("sort_order", { ascending: true });
+    .order("is_pinned", { ascending: false })
+    .order("order_index", { ascending: true });
   if (error) throw error;
   const all = (data ?? []).map(mapRow);
   const tagSet = new Set(tags);
@@ -118,6 +126,7 @@ export async function fetchStoreSettings(): Promise<StoreSettings | null> {
     globalCheckoutType: data.global_checkout_type as StoreSettings["globalCheckoutType"],
     globalCheckoutTarget: data.global_checkout_target,
     globalCheckoutMessage: data.global_checkout_message,
+    isHomepageRandom: data.is_homepage_random ?? false,
   };
 }
 

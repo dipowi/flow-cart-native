@@ -1,8 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchProducts, fetchProductCount, fetchProductById, fetchDiscoveryQueue, fetchStoreSettings } from "@/data/products";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 const PAGE_SIZE = 4;
+
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export function useProductFeed() {
   const [page, setPage] = useState(1);
@@ -19,9 +28,24 @@ export function useProductFeed() {
     staleTime: 30_000,
   });
 
+  const settingsQuery = useQuery({
+    queryKey: ["store-settings"],
+    queryFn: fetchStoreSettings,
+    staleTime: 60_000,
+  });
+
   const totalCount = countQuery.data ?? 0;
-  const visibleItems = productsQuery.data ?? [];
-  const hasMore = visibleItems.length < totalCount;
+  const rawItems = productsQuery.data ?? [];
+  const isRandom = settingsQuery.data?.isHomepageRandom ?? false;
+
+  const visibleItems = useMemo(() => {
+    if (!isRandom) return rawItems;
+    const pinned = rawItems.filter(p => p.isPinned);
+    const unpinned = rawItems.filter(p => !p.isPinned);
+    return [...pinned, ...shuffleArray(unpinned)];
+  }, [rawItems, isRandom]);
+
+  const hasMore = rawItems.length < totalCount;
 
   const loadMore = useCallback(() => {
     setPage(prev => prev + 1);
