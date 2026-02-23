@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Product } from "@/data/products";
+import type { Product } from "@/data/products";
 
 interface ProductCardProps {
   product: Product;
