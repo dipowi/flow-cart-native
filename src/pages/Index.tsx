@@ -29,12 +29,16 @@ export default function Index() {
             <ProductCard key={product.id} product={product} index={i} />
           ))}
 
-          {isLoading && <LoadingSpinner />}
+          {isLoading && (
+            <div className="col-span-2 w-full flex justify-center items-center py-6">
+              <LoadingSpinner />
+            </div>
+          )}
 
-          {hasMore && <div ref={sentinelRef} className="h-1" />}
+          {hasMore && <div ref={sentinelRef} className="col-span-2 h-1" />}
 
           {!hasMore && !isLoading && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
+            <p className="col-span-2 w-full py-8 text-center text-sm text-muted-foreground mx-auto">
               Semua produk sudah ditampilkan ✨
             </p>
           )}
