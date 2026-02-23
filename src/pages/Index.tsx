@@ -1,7 +1,7 @@
 import { products } from "@/data/products";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
-import LoadingSpinner from "@/components/LoadingSpinner";
+
 import { Store } from "lucide-react";
 
 export default function Index() {

@@ -1,10 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+
 import { MessageCircle, Send, ExternalLink } from "lucide-react";
 import { products, getCheckoutUrl, buildDiscoveryQueue } from "@/data/products";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
-import LoadingSpinner from "@/components/LoadingSpinner";
+
 import { useMemo, useEffect, useState } from "react";
 
 function CheckoutIcon({ type }: { type: string }) {
@@ -65,12 +65,7 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[730px] px-4 pb-12">
         {/* Product Detail */}
-        <motion.article
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="pt-6 space-y-4"
-        >
+        <article className="pt-6 space-y-4">
           <DetailImage src={product.image} alt={product.title} />
 
           <div className="w-full mt-8 px-5 md:px-8 flex flex-col gap-5 text-left">
@@ -99,7 +94,7 @@ export default function ProductDetail() {
               Beli Sekarang
             </a>
           </div>
-        </motion.article>
+        </article>
 
         {/* Seamless product feed */}
         <section className="mt-8">
