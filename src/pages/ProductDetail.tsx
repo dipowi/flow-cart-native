@@ -5,7 +5,7 @@ import { products, getCheckoutUrl, getRelatedProducts } from "@/data/products";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 
 function CheckoutIcon({ type }: { type: string }) {
   switch (type) {
@@ -18,6 +18,10 @@ function CheckoutIcon({ type }: { type: string }) {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const product = products.find(p => p.id === Number(id));
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [id]);
 
   const related = useMemo(
     () => (product ? getRelatedProducts(product.id, 5) : []),
@@ -93,16 +97,15 @@ export default function ProductDetail() {
           </div>
         </motion.article>
 
-        {/* Related Products */}
-        <section className="mt-10">
-          <h2 className="mb-4 text-lg font-bold text-foreground">Produk Terkait</h2>
-          <div className="space-y-4">
+        {/* Seamless product feed */}
+        <section className="mt-8">
+          <div className="grid grid-cols-2 gap-3">
             {visibleItems.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} />
             ))}
-            {isLoading && <LoadingSpinner />}
-            {hasMore && <div ref={sentinelRef} className="h-1" />}
           </div>
+          {isLoading && <LoadingSpinner />}
+          {hasMore && <div ref={sentinelRef} className="h-1" />}
         </section>
       </div>
     </div>
