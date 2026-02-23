@@ -1,37 +1,47 @@
 import { supabase } from "@/integrations/supabase/client";
 
+export interface StoreSettings {
+  id: string;
+  globalCheckoutType: "whatsapp" | "telegram" | "link";
+  globalCheckoutTarget: string;
+  globalCheckoutMessage: string | null;
+}
+
 export interface Product {
   id: string;
   title: string;
   price: string;
   originalPrice?: string | null;
   discountPercentage?: string | null;
-  image: string;
+  images: string[];
   description: string;
   tags: string[];
   checkout: {
     type: "whatsapp" | "telegram" | "link";
     target: string;
     message?: string | null;
-  };
+  } | null; // null = use global settings
 }
 
 /** Map a DB row to our frontend Product shape */
 function mapRow(row: any): Product {
+  const hasCustomCheckout = !!(row.checkout_type && row.checkout_target);
   return {
     id: row.id,
     title: row.title,
     price: row.price,
     originalPrice: row.original_price,
     discountPercentage: row.discount_percentage,
-    image: row.image_url,
+    images: row.image_urls ?? [],
     description: row.description,
     tags: row.tags ?? [],
-    checkout: {
-      type: row.checkout_type as Product["checkout"]["type"],
-      target: row.checkout_target,
-      message: row.checkout_message,
-    },
+    checkout: hasCustomCheckout
+      ? {
+          type: row.checkout_type as "whatsapp" | "telegram" | "link",
+          target: row.checkout_target as string,
+          message: row.checkout_message,
+        }
+      : null,
   };
 }
 
@@ -81,7 +91,6 @@ export async function fetchRelatedProducts(currentId: string, tags: string[]): P
 
 /** Fetch discovery queue: related first, then the rest */
 export async function fetchDiscoveryQueue(currentId: string, tags: string[]): Promise<Product[]> {
-  // Fetch all others
   const { data, error } = await supabase
     .from("products")
     .select("*")
@@ -95,8 +104,34 @@ export async function fetchDiscoveryQueue(currentId: string, tags: string[]): Pr
   return [...related, ...rest];
 }
 
-export function getCheckoutUrl(product: Product): string {
-  const { checkout, title } = product;
+/** Fetch store settings */
+export async function fetchStoreSettings(): Promise<StoreSettings | null> {
+  const { data, error } = await supabase
+    .from("store_settings")
+    .select("*")
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    id: data.id,
+    globalCheckoutType: data.global_checkout_type as StoreSettings["globalCheckoutType"],
+    globalCheckoutTarget: data.global_checkout_target,
+    globalCheckoutMessage: data.global_checkout_message,
+  };
+}
+
+/** Resolve checkout URL using product-specific or global settings */
+export function getCheckoutUrl(product: Product, globalSettings?: StoreSettings | null): string {
+  const checkout = product.checkout ?? (globalSettings ? {
+    type: globalSettings.globalCheckoutType,
+    target: globalSettings.globalCheckoutTarget,
+    message: globalSettings.globalCheckoutMessage,
+  } : null);
+
+  if (!checkout || !checkout.target) return "#";
+
+  const { title } = product;
   switch (checkout.type) {
     case "whatsapp": {
       const msg = encodeURIComponent(checkout.message || `Halo admin, saya ingin membeli ${title}`);

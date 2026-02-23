@@ -96,4 +96,11 @@
   .card-shadow-hover {
     box-shadow: 0 2px 8px 0 hsl(220 20% 10% / 0.06), 0 8px 24px 0 hsl(220 20% 10% / 0.05);
   }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

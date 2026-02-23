@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { MessageCircle, Send, ExternalLink } from "lucide-react";
 import { getCheckoutUrl } from "@/data/products";
-import { useProduct, useDiscoveryQueue } from "@/hooks/useProducts";
+import { useProduct, useDiscoveryQueue, useStoreSettings } from "@/hooks/useProducts";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
-import { useEffect, useState } from "react";
+import ImageCarousel from "@/components/ImageCarousel";
+import { useEffect } from "react";
 
 function CheckoutIcon({ type }: { type: string }) {
   switch (type) {
@@ -14,27 +15,10 @@ function CheckoutIcon({ type }: { type: string }) {
   }
 }
 
-function DetailImage({ src, alt }: { src: string; alt: string }) {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <div className="flex justify-center">
-      <div className="relative w-full max-w-[380px] aspect-square rounded-2xl overflow-hidden shadow-sm">
-        {!loaded && <div className="absolute inset-0 animate-pulse bg-muted" />}
-        <img
-          src={src}
-          alt={alt}
-          decoding="async"
-          onLoad={() => setLoaded(true)}
-          className={`h-full w-full object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading } = useProduct(id);
+  const { data: storeSettings } = useStoreSettings();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -62,13 +46,18 @@ export default function ProductDetail() {
     );
   }
 
-  const checkoutUrl = getCheckoutUrl(product);
+  const checkoutUrl = getCheckoutUrl(product, storeSettings);
+  const checkoutType = product.checkout?.type ?? storeSettings?.globalCheckoutType ?? "link";
 
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[730px] px-4 pb-12">
         <article className="pt-6 space-y-4">
-          <DetailImage src={product.image} alt={product.title} />
+          <div className="flex justify-center">
+            <div className="w-full max-w-[380px]">
+              <ImageCarousel images={product.images} alt={product.title} className="shadow-sm" />
+            </div>
+          </div>
 
           <div className="w-full mt-8 px-5 md:px-8 flex flex-col gap-5 text-left">
             <div>
@@ -92,7 +81,7 @@ export default function ProductDetail() {
               rel="noopener noreferrer"
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 mt-2 text-lg font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
             >
-              <CheckoutIcon type={product.checkout.type} />
+              <CheckoutIcon type={checkoutType} />
               Beli Sekarang
             </a>
           </div>
