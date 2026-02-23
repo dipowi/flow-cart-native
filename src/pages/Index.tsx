@@ -17,7 +17,7 @@ function SkeletonCard() {
 }
 
 export default function Index() {
-  const { visibleItems, hasMore, loadMore, isLoading } = useProductFeed();
+  const { items, hasMore, loadMore, isLoading } = useProductFeed();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // Intersection observer for infinite scroll - appends data
@@ -59,13 +59,13 @@ export default function Index() {
           )}
 
           {/* Actual products - using product.id as key for stable DOM */}
-          {!isLoading && visibleItems.map((product) => (
+          {!isLoading && items.map((product) => (
             <ProductCard key={product.id} product={product} index={0} />
           ))}
 
           {hasMore && <div ref={sentinelRef} className="col-span-2 h-1" />}
 
-          {!hasMore && visibleItems.length > 0 && !isLoading && (
+          {!hasMore && items.length > 0 && !isLoading && (
             <p className="col-span-2 w-full py-8 text-center text-sm text-muted-foreground mx-auto">
               Semua produk sudah ditampilkan ✨
             </p>
