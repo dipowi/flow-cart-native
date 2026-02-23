@@ -35,15 +35,19 @@ export default function ImageCarousel({ images, alt, className = "" }: ImageCaro
   }, []);
 
   const Placeholder = () => (
-    <div className="absolute inset-0 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground font-medium">
-      IMAGE
+    <div className="absolute inset-0 rounded-2xl bg-muted flex items-center justify-center">
+      <span className="text-muted-foreground font-medium tracking-widest text-sm uppercase">
+        IMAGE
+      </span>
     </div>
   );
 
-  if (images.length === 0) {
+  if (!images || images.length === 0) {
     return (
-      <div className={`aspect-square rounded-2xl bg-muted flex items-center justify-center text-muted-foreground font-medium ${className}`}>
-        IMAGE
+      <div className={`aspect-square rounded-2xl bg-muted flex items-center justify-center ${className}`}>
+        <span className="text-muted-foreground font-medium tracking-widest text-sm uppercase">
+          IMAGE
+        </span>
       </div>
     );
   }
