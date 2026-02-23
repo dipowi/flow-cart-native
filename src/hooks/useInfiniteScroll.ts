@@ -2,20 +2,15 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 export function useInfiniteScroll<T>(allItems: T[], pageSize = 5) {
   const [visibleCount, setVisibleCount] = useState(pageSize);
-  const [isLoading, setIsLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const visibleItems = allItems.slice(0, visibleCount);
   const hasMore = visibleCount < allItems.length;
 
   const loadMore = useCallback(() => {
-    if (isLoading || !hasMore) return;
-    setIsLoading(true);
-    setTimeout(() => {
-      setVisibleCount(prev => Math.min(prev + pageSize, allItems.length));
-      setIsLoading(false);
-    }, 600);
-  }, [isLoading, hasMore, pageSize, allItems.length]);
+    if (!hasMore) return;
+    setVisibleCount(prev => Math.min(prev + pageSize, allItems.length));
+  }, [hasMore, pageSize, allItems.length]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -36,5 +31,5 @@ export function useInfiniteScroll<T>(allItems: T[], pageSize = 5) {
     setVisibleCount(pageSize);
   }, [allItems, pageSize]);
 
-  return { visibleItems, isLoading, hasMore, sentinelRef };
+  return { visibleItems, hasMore, sentinelRef };
 }

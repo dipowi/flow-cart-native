@@ -46,7 +46,7 @@ export default function ProductDetail() {
     [product]
   );
 
-  const { visibleItems, isLoading, hasMore, sentinelRef } = useInfiniteScroll(discoveryQueue, 4);
+  const { visibleItems, hasMore, sentinelRef } = useInfiniteScroll(discoveryQueue, 4);
 
   if (!product) {
     return (
@@ -108,11 +108,6 @@ export default function ProductDetail() {
               <ProductCard key={p.id} product={p} index={i} />
             ))}
 
-            {isLoading && (
-              <div className="col-span-2 w-full flex justify-center items-center py-6">
-                <LoadingSpinner />
-              </div>
-            )}
 
             {hasMore && <div ref={sentinelRef} className="col-span-2 h-1" />}
           </div>
