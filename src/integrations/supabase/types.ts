@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      heartbeat: {
+        Row: {
+          id: string
+          last_beat: string | null
+        }
+        Insert: {
+          id?: string
+          last_beat?: string | null
+        }
+        Update: {
+          id?: string
+          last_beat?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           checkout_message: string | null
