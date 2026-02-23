@@ -24,7 +24,7 @@ export default function Index() {
         </header>
 
         {/* Product Feed */}
-        <main className="space-y-4">
+        <main className="grid grid-cols-2 gap-3">
           {visibleItems.map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} />
           ))}
