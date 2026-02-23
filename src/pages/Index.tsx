@@ -11,7 +11,7 @@ export default function Index() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[730px] px-4 pb-12">
         {/* Header */}
-        <header className="sticky top-0 z-30 -mx-4 mb-6 bg-card/80 px-4 py-4 backdrop-blur-xl border-b border-border">
+        <header className="mb-6 px-4 py-4 -mx-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
               <Store className="h-5 w-5 text-primary-foreground" />

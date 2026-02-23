@@ -150,3 +150,14 @@ export function getRelatedProducts(currentId: number, count = 5): Product[] {
   const shuffled = [...others].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 }
+
+export function buildDiscoveryQueue(currentProduct: Product): Product[] {
+  const others = products.filter(p => p.id !== currentProduct.id);
+  const currentTags = new Set(currentProduct.tags);
+  
+  const related = others.filter(p => p.tags.some(t => currentTags.has(t)));
+  const rest = others.filter(p => !p.tags.some(t => currentTags.has(t)));
+  const shuffledRest = [...rest].sort(() => Math.random() - 0.5);
+  
+  return [...related, ...shuffledRest];
+}
