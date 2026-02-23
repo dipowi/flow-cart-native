@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Supabsen = lazy(() => import("./pages/Supabsen"));
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/product/:id" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><ProductDetail /></Suspense>} />
           <Route path="/pdidin" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><Admin /></Suspense>} />
+          <Route path="/supabsen" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><Supabsen /></Suspense>} />
           <Route path="*" element={<Suspense fallback={null}><NotFound /></Suspense>} />
         </Routes>
       </BrowserRouter>
