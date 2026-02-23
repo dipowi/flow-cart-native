@@ -17,13 +17,13 @@ export type Database = {
       products: {
         Row: {
           checkout_message: string | null
-          checkout_target: string
-          checkout_type: string
+          checkout_target: string | null
+          checkout_type: string | null
           created_at: string
           description: string
           discount_percentage: string | null
           id: string
-          image_url: string
+          image_urls: string[]
           original_price: string | null
           price: string
           sort_order: number
@@ -32,13 +32,13 @@ export type Database = {
         }
         Insert: {
           checkout_message?: string | null
-          checkout_target: string
-          checkout_type: string
+          checkout_target?: string | null
+          checkout_type?: string | null
           created_at?: string
           description: string
           discount_percentage?: string | null
           id?: string
-          image_url: string
+          image_urls?: string[]
           original_price?: string | null
           price: string
           sort_order?: number
@@ -47,13 +47,13 @@ export type Database = {
         }
         Update: {
           checkout_message?: string | null
-          checkout_target?: string
-          checkout_type?: string
+          checkout_target?: string | null
+          checkout_type?: string | null
           created_at?: string
           description?: string
           discount_percentage?: string | null
           id?: string
-          image_url?: string
+          image_urls?: string[]
           original_price?: string | null
           price?: string
           sort_order?: number
@@ -62,15 +62,63 @@ export type Database = {
         }
         Relationships: []
       }
+      store_settings: {
+        Row: {
+          global_checkout_message: string | null
+          global_checkout_target: string
+          global_checkout_type: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          global_checkout_message?: string | null
+          global_checkout_target?: string
+          global_checkout_type?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          global_checkout_message?: string | null
+          global_checkout_target?: string
+          global_checkout_type?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -197,6 +245,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchProducts, fetchProductCount, fetchProductById, fetchDiscoveryQueue } from "@/data/products";
-import { useState, useCallback, useMemo } from "react";
+import { fetchProducts, fetchProductCount, fetchProductById, fetchDiscoveryQueue, fetchStoreSettings } from "@/data/products";
+import { useState, useCallback } from "react";
 
 const PAGE_SIZE = 4;
 
@@ -45,5 +45,13 @@ export function useDiscoveryQueue(productId: string | undefined, tags: string[])
     queryFn: () => fetchDiscoveryQueue(productId!, tags),
     enabled: !!productId,
     staleTime: 30_000,
+  });
+}
+
+export function useStoreSettings() {
+  return useQuery({
+    queryKey: ["store-settings"],
+    queryFn: fetchStoreSettings,
+    staleTime: 60_000,
   });
 }

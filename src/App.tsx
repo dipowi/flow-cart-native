@@ -21,7 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/product/:id" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><ProductDetail /></Suspense>} />
-          <Route path="/admin" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><Admin /></Suspense>} />
+          <Route path="/pdidin" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><Admin /></Suspense>} />
           <Route path="*" element={<Suspense fallback={null}><NotFound /></Suspense>} />
         </Routes>
       </BrowserRouter>

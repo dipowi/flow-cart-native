@@ -1,6 +1,7 @@
-import { memo, useState } from "react";
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import type { Product } from "@/data/products";
+import ImageCarousel from "./ImageCarousel";
 
 interface ProductCardProps {
   product: Product;
@@ -8,25 +9,10 @@ interface ProductCardProps {
 }
 
 function ProductCardInner({ product }: ProductCardProps) {
-  const [loaded, setLoaded] = useState(false);
-
   return (
     <article className="overflow-hidden rounded-2xl bg-card card-shadow">
       <Link to={`/product/${product.id}`} className="block">
-        <div className="w-full aspect-square overflow-hidden relative bg-muted">
-          {!loaded && (
-            <div className="absolute inset-0 animate-pulse bg-muted" />
-          )}
-          <img
-            src={product.image}
-            alt={product.title}
-            loading="lazy"
-            decoding="async"
-            onLoad={() => setLoaded(true)}
-            className={`h-full w-full object-cover transition-transform duration-500 hover:scale-105 ${loaded ? "opacity-100" : "opacity-0"}`}
-          />
-        </div>
-
+        <ImageCarousel images={product.images} alt={product.title} />
         <div className="p-3 space-y-1">
           <h3 className="text-sm font-semibold leading-snug text-card-foreground line-clamp-2">
             {product.title}
