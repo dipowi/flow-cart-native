@@ -1,6 +1,6 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { MessageCircle, Send, ExternalLink } from "lucide-react";
-import { getCheckoutUrl } from "@/data/products";
+import { getCheckoutUrl, type Product } from "@/data/products";
 import { useProduct, useDiscoveryQueue, useStoreSettings } from "@/hooks/useProducts";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
@@ -17,7 +17,10 @@ function CheckoutIcon({ type }: { type: string }) {
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const { data: product, isLoading } = useProduct(id);
+  const location = useLocation();
+  const passedProduct = (location.state as { product?: Product })?.product;
+  const { data: fetchedProduct, isLoading } = useProduct(passedProduct ? undefined : id);
+  const product = passedProduct ?? fetchedProduct ?? null;
   const { data: storeSettings } = useStoreSettings();
 
   useEffect(() => {
