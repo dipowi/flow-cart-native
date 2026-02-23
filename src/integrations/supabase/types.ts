@@ -24,6 +24,8 @@ export type Database = {
           discount_percentage: string | null
           id: string
           image_urls: string[]
+          is_pinned: boolean
+          order_index: number
           original_price: string | null
           price: string
           sort_order: number
@@ -39,6 +41,8 @@ export type Database = {
           discount_percentage?: string | null
           id?: string
           image_urls?: string[]
+          is_pinned?: boolean
+          order_index?: number
           original_price?: string | null
           price: string
           sort_order?: number
@@ -54,6 +58,8 @@ export type Database = {
           discount_percentage?: string | null
           id?: string
           image_urls?: string[]
+          is_pinned?: boolean
+          order_index?: number
           original_price?: string | null
           price?: string
           sort_order?: number
@@ -68,6 +74,7 @@ export type Database = {
           global_checkout_target: string
           global_checkout_type: string
           id: string
+          is_homepage_random: boolean
           updated_at: string
         }
         Insert: {
@@ -75,6 +82,7 @@ export type Database = {
           global_checkout_target?: string
           global_checkout_type?: string
           id?: string
+          is_homepage_random?: boolean
           updated_at?: string
         }
         Update: {
@@ -82,6 +90,7 @@ export type Database = {
           global_checkout_target?: string
           global_checkout_type?: string
           id?: string
+          is_homepage_random?: boolean
           updated_at?: string
         }
         Relationships: []
