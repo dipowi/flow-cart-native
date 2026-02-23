@@ -1,11 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-
 import { MessageCircle, Send, ExternalLink } from "lucide-react";
-import { products, getCheckoutUrl, buildDiscoveryQueue } from "@/data/products";
+import { getCheckoutUrl } from "@/data/products";
+import { useProduct, useDiscoveryQueue } from "@/hooks/useProducts";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
-
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 function CheckoutIcon({ type }: { type: string }) {
   switch (type) {
@@ -35,18 +34,22 @@ function DetailImage({ src, alt }: { src: string; alt: string }) {
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const product = products.find(p => p.id === Number(id));
+  const { data: product, isLoading } = useProduct(id);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [id]);
 
-  const discoveryQueue = useMemo(
-    () => (product ? buildDiscoveryQueue(product) : []),
-    [product]
+  const { data: discoveryItems = [] } = useDiscoveryQueue(
+    product?.id,
+    product?.tags ?? []
   );
 
-  const { visibleItems, hasMore, sentinelRef } = useInfiniteScroll(discoveryQueue, 4);
+  const { visibleItems, hasMore, sentinelRef } = useInfiniteScroll(discoveryItems, 4);
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   if (!product) {
     return (
@@ -64,7 +67,6 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[730px] px-4 pb-12">
-        {/* Product Detail */}
         <article className="pt-6 space-y-4">
           <DetailImage src={product.image} alt={product.title} />
 
@@ -96,14 +98,11 @@ export default function ProductDetail() {
           </div>
         </article>
 
-        {/* Seamless product feed */}
         <section className="mt-8">
           <div className="grid grid-cols-2 gap-3">
             {visibleItems.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} />
             ))}
-
-
             {hasMore && <div ref={sentinelRef} className="col-span-2 h-1" />}
           </div>
         </section>

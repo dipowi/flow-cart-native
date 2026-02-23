@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Admin = lazy(() => import("./pages/Admin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/product/:id" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><ProductDetail /></Suspense>} />
+          <Route path="/admin" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><Admin /></Suspense>} />
           <Route path="*" element={<Suspense fallback={null}><NotFound /></Suspense>} />
         </Routes>
       </BrowserRouter>
