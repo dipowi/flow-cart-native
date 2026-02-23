@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MessageCircle, Send, ExternalLink } from "lucide-react";
-import { products, getCheckoutUrl, getRelatedProducts } from "@/data/products";
+import { products, getCheckoutUrl, buildDiscoveryQueue } from "@/data/products";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -23,12 +23,12 @@ export default function ProductDetail() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [id]);
 
-  const related = useMemo(
-    () => (product ? getRelatedProducts(product.id, 8) : []),
+  const discoveryQueue = useMemo(
+    () => (product ? buildDiscoveryQueue(product) : []),
     [product]
   );
 
-  const { visibleItems, isLoading, hasMore, sentinelRef } = useInfiniteScroll(related, 4);
+  const { visibleItems, isLoading, hasMore, sentinelRef } = useInfiniteScroll(discoveryQueue, 4);
 
   if (!product) {
     return (
