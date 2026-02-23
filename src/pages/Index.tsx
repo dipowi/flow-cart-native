@@ -1,14 +1,26 @@
 import { useProductFeed } from "@/hooks/useProducts";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
 import { Store } from "lucide-react";
 import { useEffect, useRef } from "react";
+
+function SkeletonCard() {
+  return (
+    <div className="overflow-hidden rounded-2xl bg-card card-shadow">
+      <div className="aspect-square animate-pulse bg-muted rounded-t-2xl" />
+      <div className="p-3 space-y-2">
+        <div className="h-4 w-3/4 animate-pulse bg-muted rounded" />
+        <div className="h-4 w-1/2 animate-pulse bg-muted rounded" />
+        <div className="h-5 w-2/5 animate-pulse bg-muted rounded" />
+      </div>
+    </div>
+  );
+}
 
 export default function Index() {
   const { visibleItems, hasMore, loadMore, isLoading } = useProductFeed();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  // Intersection observer for infinite scroll
+  // Intersection observer for infinite scroll - appends data
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || !hasMore) return;
@@ -36,13 +48,24 @@ export default function Index() {
         </header>
 
         <main className="grid grid-cols-2 gap-3">
-          {visibleItems.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
+          {/* Instant App Shell: show 4 skeletons while loading */}
+          {isLoading && (
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
+          )}
+
+          {/* Actual products - using product.id as key for stable DOM */}
+          {!isLoading && visibleItems.map((product) => (
+            <ProductCard key={product.id} product={product} index={0} />
           ))}
 
           {hasMore && <div ref={sentinelRef} className="col-span-2 h-1" />}
 
-          {!hasMore && visibleItems.length > 0 && (
+          {!hasMore && visibleItems.length > 0 && !isLoading && (
             <p className="col-span-2 w-full py-8 text-center text-sm text-muted-foreground mx-auto">
               Semua produk sudah ditampilkan ✨
             </p>

@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchProducts, fetchProductCount, fetchProductById, fetchDiscoveryQueue, fetchStoreSettings } from "@/data/products";
-import { useState, useCallback, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchProductCount, fetchProductById, fetchDiscoveryQueue, fetchStoreSettings, fetchProducts } from "@/data/products";
+import { useState, useCallback, useMemo, useRef } from "react";
+import type { Product } from "@/data/products";
 
 const PAGE_SIZE = 4;
 
@@ -13,8 +14,17 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
+/**
+ * True server-side pagination hook.
+ * - First load fetches only 4 products (.range(0,3))
+ * - Subsequent loads APPEND via .range(from, to)
+ * - Never replaces existing items in state
+ */
 export function useProductFeed() {
-  const [page, setPage] = useState(1);
+  const [items, setItems] = useState<Product[]>([]);
+  const [page, setPage] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const fetchingRef = useRef(false);
 
   const countQuery = useQuery({
     queryKey: ["products-count"],
@@ -22,9 +32,15 @@ export function useProductFeed() {
     staleTime: 60_000,
   });
 
-  const productsQuery = useQuery({
-    queryKey: ["products", page],
-    queryFn: () => fetchProducts(0, page * PAGE_SIZE - 1),
+  // Initial load - only first 4 products
+  const initialQuery = useQuery({
+    queryKey: ["products-initial"],
+    queryFn: async () => {
+      const data = await fetchProducts(0, PAGE_SIZE - 1);
+      setItems(data);
+      setPage(1);
+      return data;
+    },
     staleTime: 30_000,
   });
 
@@ -35,23 +51,41 @@ export function useProductFeed() {
   });
 
   const totalCount = countQuery.data ?? 0;
-  const rawItems = productsQuery.data ?? [];
   const isRandom = settingsQuery.data?.isHomepageRandom ?? false;
 
   const visibleItems = useMemo(() => {
-    if (!isRandom) return rawItems;
-    const pinned = rawItems.filter(p => p.isPinned);
-    const unpinned = rawItems.filter(p => !p.isPinned);
+    if (!isRandom) return items;
+    const pinned = items.filter(p => p.isPinned);
+    const unpinned = items.filter(p => !p.isPinned);
     return [...pinned, ...shuffleArray(unpinned)];
-  }, [rawItems, isRandom]);
+  }, [items, isRandom]);
 
-  const hasMore = rawItems.length < totalCount;
+  const hasMore = items.length < totalCount;
 
-  const loadMore = useCallback(() => {
-    setPage(prev => prev + 1);
-  }, []);
+  const loadMore = useCallback(async () => {
+    if (fetchingRef.current || !hasMore) return;
+    fetchingRef.current = true;
+    setIsLoadingMore(true);
+    try {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      const newData = await fetchProducts(from, to);
+      // APPEND, never replace
+      setItems(prev => [...prev, ...newData]);
+      setPage(prev => prev + 1);
+    } finally {
+      fetchingRef.current = false;
+      setIsLoadingMore(false);
+    }
+  }, [page, hasMore]);
 
-  return { visibleItems, hasMore, loadMore, isLoading: productsQuery.isLoading };
+  return {
+    visibleItems,
+    hasMore,
+    loadMore,
+    isLoading: initialQuery.isLoading,
+    isLoadingMore,
+  };
 }
 
 export function useProduct(id: string | undefined) {
