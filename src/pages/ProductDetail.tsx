@@ -61,7 +61,7 @@ export default function ProductDetail() {
             />
           </div>
 
-          <div className="flex flex-col gap-4 mt-6 max-w-[400px] mx-auto w-full">
+          <div className="w-full mt-8 px-5 md:px-8 flex flex-col gap-5 text-left">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight leading-snug">{product.title}</h1>
               {product.originalPrice ? (
