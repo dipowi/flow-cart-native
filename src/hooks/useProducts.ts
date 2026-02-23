@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchProductById, fetchDiscoveryQueue, fetchStoreSettings } from "@/data/products";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { Product } from "@/data/products";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -35,52 +35,76 @@ function mapRow(row: any): Product {
 const CHUNK = 4;
 
 /**
- * Master Array Slicing architecture:
- * 1. Fetch ALL products + settings ONCE on mount
- * 2. Sort pinned first, shuffle unpinned if random is on
- * 3. Store in master array, never re-fetch or re-shuffle
- * 4. Lazy load via array.slice(0, visibleCount)
+ * Two-Stage Hybrid Fetch:
+ * Stage 1: Fetch top 4 products instantly (strict DB order, respects pins).
+ * Stage 2: Background-fetch remaining products, shuffle if random is on.
+ * Scroll: Slice from pending array — zero network calls, zero flicker.
  */
 export function useProductFeed() {
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [visibleCount, setVisibleCount] = useState(CHUNK);
+  const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
+  const [pendingProducts, setPendingProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const pendingRef = useRef<Product[]>([]);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function init() {
-      const [productsRes, settingsRes] = await Promise.all([
-        supabase.from("products").select("*").order("is_pinned", { ascending: false }).order("order_index", { ascending: true }),
+    async function stage1() {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("is_pinned", { ascending: false })
+        .order("order_index", { ascending: true })
+        .limit(CHUNK);
+
+      if (cancelled || error) return;
+      setVisibleProducts((data ?? []).map(mapRow));
+      setIsLoading(false);
+
+      // Stage 2: background fetch rest + settings
+      const [restRes, settingsRes] = await Promise.all([
+        supabase
+          .from("products")
+          .select("*")
+          .order("is_pinned", { ascending: false })
+          .order("order_index", { ascending: true })
+          .range(CHUNK, 1000),
         supabase.from("store_settings").select("*").limit(1).maybeSingle(),
       ]);
 
       if (cancelled) return;
-      if (productsRes.error) throw productsRes.error;
-
-      const all = (productsRes.data ?? []).map(mapRow);
+      const rest = (restRes.data ?? []).map(mapRow);
       const isRandom = settingsRes.data?.is_homepage_random ?? false;
 
-      const pinned = all.filter(p => p.isPinned);
-      const unpinned = all.filter(p => !p.isPinned);
-      const finalArray = [...pinned, ...(isRandom ? shuffleArray(unpinned) : unpinned)];
+      const pinned = rest.filter(p => p.isPinned);
+      const unpinned = rest.filter(p => !p.isPinned);
+      const processed = [...pinned, ...(isRandom ? shuffleArray(unpinned) : unpinned)];
 
-      setAllProducts(finalArray);
-      setIsLoading(false);
+      pendingRef.current = processed;
+      setPendingProducts(processed);
     }
 
-    init();
+    stage1();
     return () => { cancelled = true; };
   }, []);
 
-  const items = allProducts.slice(0, visibleCount);
-  const hasMore = visibleCount < allProducts.length;
+  const hasMore = pendingProducts.length > 0;
 
   const loadMore = useCallback(() => {
-    setVisibleCount(prev => prev + CHUNK);
+    const next = pendingRef.current.slice(0, CHUNK);
+    const remaining = pendingRef.current.slice(CHUNK);
+    pendingRef.current = remaining;
+    setVisibleProducts(prev => [...prev, ...next]);
+    setPendingProducts(remaining);
   }, []);
 
-  return { items, hasMore, loadMore, isLoading, isLoadingMore: false };
+  return {
+    items: visibleProducts,
+    hasMore,
+    loadMore,
+    isLoading,
+    isLoadingMore: false,
+  };
 }
 
 export function useProduct(id: string | undefined) {
