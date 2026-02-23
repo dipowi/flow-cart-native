@@ -7,15 +7,15 @@ interface ProductCardProps {
   index: number;
 }
 
-function ProductCardInner({ product, index }: ProductCardProps) {
+function ProductCardInner({ product }: ProductCardProps) {
   const [loaded, setLoaded] = useState(false);
 
   return (
     <article className="overflow-hidden rounded-2xl bg-card card-shadow">
       <Link to={`/product/${product.id}`} className="block">
-        <div className="aspect-square overflow-hidden relative">
+        <div className="w-full aspect-square overflow-hidden relative bg-muted">
           {!loaded && (
-            <div className="absolute inset-0 animate-pulse bg-muted rounded-t-2xl" />
+            <div className="absolute inset-0 animate-pulse bg-muted" />
           )}
           <img
             src={product.image}
