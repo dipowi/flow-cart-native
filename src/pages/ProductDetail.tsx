@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, MessageCircle, Send, ExternalLink } from "lucide-react";
+import { MessageCircle, Send, ExternalLink } from "lucide-react";
 import { products, getCheckoutUrl, getRelatedProducts } from "@/data/products";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
@@ -46,30 +46,22 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[730px] px-4 pb-12">
-        {/* Header */}
-        <header className="sticky top-0 z-30 -mx-4 mb-6 bg-card/80 px-4 py-4 backdrop-blur-xl border-b border-border">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </Link>
-        </header>
-
         {/* Product Detail */}
         <motion.article
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="overflow-hidden rounded-2xl bg-card card-shadow"
+          className="pt-6 space-y-4"
         >
-          <div className="aspect-square overflow-hidden">
+          <div className="flex justify-center">
             <img
               src={product.image}
               alt={product.title}
-              className="h-full w-full object-cover"
+              className="w-full max-w-[380px] aspect-square object-cover rounded-2xl shadow-sm"
             />
           </div>
 
-          <div className="p-5 space-y-4">
+          <div className="space-y-4 px-1">
             <div>
               <h1 className="text-xl font-bold text-card-foreground leading-snug">{product.title}</h1>
               <p className="mt-1.5 text-2xl font-extrabold text-primary">{product.price}</p>
@@ -103,9 +95,15 @@ export default function ProductDetail() {
             {visibleItems.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} />
             ))}
+
+            {isLoading && (
+              <div className="col-span-2 w-full flex justify-center items-center py-6">
+                <LoadingSpinner />
+              </div>
+            )}
+
+            {hasMore && <div ref={sentinelRef} className="col-span-2 h-1" />}
           </div>
-          {isLoading && <LoadingSpinner />}
-          {hasMore && <div ref={sentinelRef} className="h-1" />}
         </section>
       </div>
     </div>
