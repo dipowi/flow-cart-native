@@ -14,9 +14,11 @@ function ProductCardInner({ product }: ProductCardProps) {
       <Link to={`/product/${product.id}`} className="block">
         <ImageCarousel images={product.images} alt={product.title} />
         <div className="p-3 space-y-1">
-          <h3 className="text-sm font-semibold leading-snug text-card-foreground line-clamp-2">
-            {product.title}
-          </h3>
+          <div className="min-h-[2.75rem]">
+            <h3 className="text-sm font-semibold leading-snug text-card-foreground line-clamp-2">
+              {product.title}
+            </h3>
+          </div>
           {product.originalPrice && (
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-muted-foreground font-medium line-through">{product.originalPrice}</span>
