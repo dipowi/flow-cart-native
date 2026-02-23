@@ -1,35 +1,36 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
-export function useInfiniteScroll<T>(allItems: T[], pageSize = 5) {
-  const [visibleCount, setVisibleCount] = useState(pageSize);
+const ITEMS_PER_PAGE = 4;
+
+export function useInfiniteScroll<T>(allItems: T[], pageSize = ITEMS_PER_PAGE) {
+  const [page, setPage] = useState(1);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const visibleItems = allItems.slice(0, visibleCount);
-  const hasMore = visibleCount < allItems.length;
+  const visibleItems = allItems.slice(0, page * pageSize);
+  const hasMore = visibleItems.length < allItems.length;
 
   const loadMore = useCallback(() => {
-    if (!hasMore) return;
-    setVisibleCount(prev => Math.min(prev + pageSize, allItems.length));
-  }, [hasMore, pageSize, allItems.length]);
+    setPage(prev => prev + 1);
+  }, []);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel) return;
+    if (!sentinel || !hasMore) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) loadMore();
       },
-      { rootMargin: "200px" }
+      { rootMargin: "100px" }
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMore]);
+  }, [loadMore, hasMore]);
 
-  // Reset when items change
+  // Reset page when source data changes
   useEffect(() => {
-    setVisibleCount(pageSize);
-  }, [allItems, pageSize]);
+    setPage(1);
+  }, [allItems]);
 
   return { visibleItems, hasMore, sentinelRef };
 }
