@@ -43,6 +43,7 @@ export type Database = {
           order_index: number
           original_price: string | null
           price: string
+          slug: string
           sort_order: number
           tags: string[]
           title: string
@@ -60,6 +61,7 @@ export type Database = {
           order_index?: number
           original_price?: string | null
           price: string
+          slug: string
           sort_order?: number
           tags?: string[]
           title: string
@@ -77,6 +79,7 @@ export type Database = {
           order_index?: number
           original_price?: string | null
           price?: string
+          slug?: string
           sort_order?: number
           tags?: string[]
           title?: string

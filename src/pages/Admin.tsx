@@ -123,6 +123,7 @@ function GlobalSettingsTab() {
 // ─── Product Form (Add/Edit) — Wide 2-Column Layout ─────────────────────────
 interface ProductFormData {
   title: string;
+  slug: string;
   price: string;
   original_price: string;
   discount_percentage: string;
@@ -137,8 +138,17 @@ interface ProductFormData {
   order_index: number;
 }
 
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 const emptyForm: ProductFormData = {
-  title: "", price: "", original_price: "", discount_percentage: "",
+  title: "", slug: "", price: "", original_price: "", discount_percentage: "",
   image_urls: [""], description: "", tags: "",
   is_pinned: false, useCustomCheckout: false, checkout_type: "whatsapp",
   checkout_target: "", checkout_message: "", order_index: 0,
@@ -152,6 +162,7 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
     if (!product) return emptyForm;
     return {
       title: product.title ?? "",
+      slug: product.slug ?? "",
       price: product.price ?? "",
       original_price: product.original_price ?? "",
       discount_percentage: product.discount_percentage ?? "",
@@ -181,6 +192,7 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
     mutationFn: async () => {
       const payload = {
         title: form.title,
+        slug: form.slug,
         price: form.price,
         original_price: form.original_price || null,
         discount_percentage: form.discount_percentage || null,
@@ -219,7 +231,18 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Nama Produk *</Label>
-            <Input value={form.title} onChange={e => set("title", e.target.value)} placeholder="Nama produk..." />
+            <Input value={form.title} onChange={e => {
+              const title = e.target.value;
+              set("title", title);
+              if (!isEdit || form.slug === generateSlug(form.title)) {
+                set("slug", generateSlug(title));
+              }
+            }} placeholder="Nama produk..." />
+          </div>
+          <div className="space-y-2">
+            <Label>Slug (URL)</Label>
+            <Input value={form.slug} onChange={e => set("slug", e.target.value)} placeholder="nama-produk" className="font-mono text-sm" />
+            <p className="text-xs text-muted-foreground">URL: /p/{form.slug || "..."}</p>
           </div>
           <div className="space-y-2">
             <Label>Deskripsi *</Label>

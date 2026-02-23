@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchProductById, fetchDiscoveryQueue, fetchStoreSettings } from "@/data/products";
+import { fetchProductById, fetchProductBySlug, fetchDiscoveryQueue, fetchStoreSettings } from "@/data/products";
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { Product } from "@/data/products";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,7 @@ function mapRow(row: any): Product {
   const hasCustomCheckout = !!(row.checkout_type && row.checkout_target);
   return {
     id: row.id,
+    slug: row.slug ?? "",
     title: row.title,
     price: row.price,
     originalPrice: row.original_price,
@@ -112,6 +113,15 @@ export function useProduct(id: string | undefined) {
     queryKey: ["product", id],
     queryFn: () => fetchProductById(id!),
     enabled: !!id,
+    staleTime: 60_000,
+  });
+}
+
+export function useProductBySlug(slug: string | undefined) {
+  return useQuery({
+    queryKey: ["product-slug", slug],
+    queryFn: () => fetchProductBySlug(slug!),
+    enabled: !!slug,
     staleTime: 60_000,
   });
 }
