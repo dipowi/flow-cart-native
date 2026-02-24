@@ -73,13 +73,13 @@ export default function ProductDetail() {
         {/* Split-Pane: 1 col mobile, 2 col desktop */}
         <article className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 items-start">
           {/* Left Column — Sticky Visuals */}
-          <div className="w-full md:sticky md:top-24 md:self-start">
+          <div className="w-full mt-0 pt-0 md:sticky md:top-24 md:self-start">
             <ImageCarousel images={product.images} alt={product.title} className="shadow-sm rounded-2xl" priority={true} />
           </div>
 
           {/* Right Column — Details & Action */}
-          <div className="flex flex-col justify-start items-start h-full pt-2 md:pt-4">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight tracking-tight line-clamp-2 min-h-[3.5rem] md:min-h-[4.5rem] flex items-start">
+          <div className="flex flex-col justify-start items-start h-full mt-0 pt-0">
+            <h1 className="mt-0 pt-0 text-2xl md:text-3xl font-extrabold text-foreground leading-tight tracking-tight line-clamp-2 min-h-[3.5rem] md:min-h-[4.5rem] flex items-start">
               {product.title}
             </h1>
 
