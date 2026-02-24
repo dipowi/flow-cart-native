@@ -93,7 +93,30 @@ export default function ProductDetail() {
               {product.price}
             </p>
 
-            <div ref={descriptionRef} className="w-full border-t border-border my-5 pt-5 scroll-mt-24">
+            <a
+              href={checkoutUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl px-5 py-4 text-lg md:text-xl font-bold tracking-wide text-white transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+              style={{
+                background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
+                boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 15px 30px -5px hsla(25, 95%, 53%, 0.4)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)'; }}
+            >
+              <CheckoutIcon type={checkoutType} />
+              Beli Sekarang
+            </a>
+            <div className="flex items-center justify-center gap-2 mt-4 w-full text-xs font-medium text-muted-foreground">
+              <span>🔒 Transaksi Aman & Langsung</span>
+              <span>•</span>
+              <span>⚡ Respon Cepat</span>
+            </div>
+
+            <div className="w-full border-b border-border my-8" />
+
+            <div ref={descriptionRef} className="w-full scroll-mt-24">
               <div className="relative">
                 <div className={`text-base md:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap overflow-hidden transition-all duration-300 ${isDescExpanded ? 'max-h-[2000px]' : 'max-h-32'}`}>
                   {product.description}
@@ -109,27 +132,6 @@ export default function ProductDetail() {
               >
                 {isDescExpanded ? 'Tutup Deskripsi' : 'Baca Selengkapnya...'}
               </button>
-            </div>
-
-            <a
-              href={checkoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl px-5 py-4 text-lg md:text-xl font-bold tracking-wide text-white transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
-                boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 15px 30px -5px hsla(25, 95%, 53%, 0.4)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)'; }}
-            >
-              <CheckoutIcon type={checkoutType} />
-              Beli Sekarang
-            </a>
-            <div className="flex items-center justify-center gap-2 mt-4 w-full text-xs font-medium text-muted-foreground">
-              <span>🔒 Transaksi Aman & Langsung</span>
-              <span>•</span>
-              <span>⚡ Respon Cepat</span>
             </div>
           </div>
         </article>
