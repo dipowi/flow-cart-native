@@ -5,7 +5,7 @@ import { useProductBySlug, useDiscoveryQueue, useStoreSettings } from "@/hooks/u
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
 import ImageCarousel from "@/components/ImageCarousel";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 function CheckoutIcon({ type }: { type: string }) {
   switch (type) {
@@ -24,9 +24,11 @@ export default function ProductDetail() {
   const { data: storeSettings } = useStoreSettings();
 
   const descriptionRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
+  const [showReadMore, setShowReadMore] = useState(false);
 
-  const handleToggleDescription = () => {
+  const handleToggleDescription = useCallback(() => {
     if (isDescExpanded) {
       setIsDescExpanded(false);
       setTimeout(() => {
@@ -35,12 +37,20 @@ export default function ProductDetail() {
     } else {
       setIsDescExpanded(true);
     }
-  };
+  }, [isDescExpanded]);
 
   useEffect(() => {
     setIsDescExpanded(false);
+    setShowReadMore(false);
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [slug]);
+
+  useEffect(() => {
+    if (textRef.current) {
+      const isOverflowing = textRef.current.scrollHeight > textRef.current.clientHeight;
+      setShowReadMore(isOverflowing);
+    }
+  }, [product?.description, isDescExpanded]);
 
   const { data: discoveryItems = [] } = useDiscoveryQueue(
     product?.id,
@@ -134,20 +144,25 @@ export default function ProductDetail() {
 
             <div ref={descriptionRef} className="w-full scroll-mt-24">
               <div className="relative">
-                <div className={`text-base md:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap overflow-hidden transition-all duration-300 ${isDescExpanded ? 'max-h-[2000px]' : 'max-h-32'}`}>
+                <div
+                  ref={textRef}
+                  className={`text-base md:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap transition-all duration-300 ${isDescExpanded ? '' : 'line-clamp-2'}`}
+                >
                   {product.description}
                 </div>
-                {!isDescExpanded && (
-                  <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-background to-transparent" />
+                {showReadMore && !isDescExpanded && (
+                  <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
                 )}
               </div>
-              <button
-                onClick={handleToggleDescription}
-                className="text-sm font-semibold mt-2 transition-colors hover:opacity-80"
-                style={{ color: 'hsl(25, 95%, 53%)' }}
-              >
-                {isDescExpanded ? 'Tutup Deskripsi' : 'Baca Selengkapnya...'}
-              </button>
+              {showReadMore && (
+                <button
+                  onClick={handleToggleDescription}
+                  className="text-sm font-semibold mt-2 transition-colors hover:opacity-80"
+                  style={{ color: 'hsl(25, 95%, 53%)' }}
+                >
+                  {isDescExpanded ? 'Tutup Deskripsi' : 'Baca Selengkapnya...'}
+                </button>
+              )}
             </div>
           </div>
         </article>
