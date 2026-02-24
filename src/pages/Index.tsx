@@ -1,7 +1,6 @@
 import { useProductFeed } from "@/hooks/useProducts";
 import { useStoreSettings } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
-import { Store } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 function SkeletonCard() {
@@ -26,24 +25,20 @@ function DynamicHeader() {
   const align = settings?.headerAlignment ?? "left";
 
   const alignClasses = {
-    left: "flex flex-row items-center text-left justify-start",
-    center: "flex flex-col items-center text-center justify-center",
-    right: "flex flex-row-reverse items-center text-right justify-start",
+    left: "flex flex-row items-center justify-start gap-3 md:gap-4 text-left",
+    center: "flex flex-row items-center justify-center gap-3 md:gap-4 text-left",
+    right: "flex flex-row items-center justify-end gap-3 md:gap-4 text-right",
   };
 
   return (
     <header className="mb-6 px-4 py-4 -mx-4 border-b border-border">
-      <div className={`gap-3 ${alignClasses[align]}`}>
-        {logoUrl ? (
-          <img src={logoUrl} alt={name} className="h-9 w-9 rounded-xl object-cover flex-shrink-0" />
-        ) : (
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary flex-shrink-0">
-            <Store className="h-5 w-5 text-primary-foreground" />
-          </div>
+      <div className={alignClasses[align]}>
+        {logoUrl && (
+          <img src={logoUrl} alt={name} className="h-10 w-auto object-contain flex-shrink-0" />
         )}
         <div>
-          <h1 className="text-lg font-bold text-foreground leading-tight">{name}</h1>
-          <p className="text-xs text-muted-foreground">{desc}</p>
+          <h1 className="text-xl font-extrabold text-foreground tracking-tight leading-tight">{name}</h1>
+          <p className="text-sm text-muted-foreground">{desc}</p>
         </div>
       </div>
     </header>
