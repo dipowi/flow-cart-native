@@ -1,5 +1,5 @@
 import { useParams, Link, useLocation } from "react-router-dom";
-import { MessageCircle, Send, ExternalLink } from "lucide-react";
+import { MessageCircle, Send, ExternalLink, ShieldCheck, Zap } from "lucide-react";
 import { getCheckoutUrl, type Product } from "@/data/products";
 import { useProductBySlug, useDiscoveryQueue, useStoreSettings } from "@/hooks/useProducts";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -118,10 +118,16 @@ export default function ProductDetail() {
               <CheckoutIcon type={checkoutType} />
               Beli Sekarang
             </a>
-            <div className="flex items-center justify-center gap-2 mt-4 w-full text-xs font-medium text-muted-foreground">
-              <span>🔒 Transaksi Aman & Langsung</span>
-              <span>•</span>
-              <span>⚡ Respon Cepat</span>
+            <div className="flex items-center justify-center gap-3 mt-4 w-full text-[13px] font-medium text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <span>Transaksi Aman Terverifikasi</span>
+              </div>
+              <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+              <div className="flex items-center gap-1.5">
+                <Zap className="w-4 h-4" style={{ color: 'hsl(25, 95%, 53%)' }} />
+                <span>Respon Instan</span>
+              </div>
             </div>
 
             <div className="w-full border-b border-border my-8" />
