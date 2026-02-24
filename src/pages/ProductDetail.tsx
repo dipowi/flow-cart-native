@@ -78,18 +78,18 @@ export default function ProductDetail() {
           </div>
 
           {/* Right Column — Details & Action */}
-          <div className="flex flex-col gap-1 text-left items-start">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight md:leading-snug tracking-tight">
+          <div className="flex flex-col justify-start items-start h-full pt-2 md:pt-4">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight md:leading-snug tracking-tight line-clamp-3 min-h-[2.5rem] md:min-h-[3rem]">
               {product.title}
             </h1>
 
             {product.originalPrice ? (
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-2 md:mt-4 flex items-center gap-2">
                 <span className="text-xl text-muted-foreground font-medium line-through">{product.originalPrice}</span>
                 <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">-{product.discountPercentage}</span>
               </div>
             ) : null}
-            <p className={`${product.originalPrice ? 'mt-1' : 'mt-3'} text-4xl md:text-5xl font-black tracking-tight`} style={{ color: 'hsl(25, 95%, 53%)' }}>
+            <p className={`${product.originalPrice ? 'mt-1' : 'mt-2 md:mt-4'} text-4xl md:text-5xl font-black tracking-tight`} style={{ color: 'hsl(25, 95%, 53%)' }}>
               {product.price}
             </p>
 
