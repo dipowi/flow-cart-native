@@ -54,27 +54,33 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[730px] px-4 pb-12">
-        <article className="pt-6 space-y-4">
-          <div className="flex justify-center">
-            <div className="w-full max-w-[380px]">
-              <ImageCarousel images={product.images} alt={product.title} className="shadow-sm" priority={true} />
+      <div className="mx-auto max-w-[960px] px-4 pb-12">
+        {/* Split-Pane: 1 col mobile, 2 col desktop */}
+        <article className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+          {/* Left Column — Visuals */}
+          <div className="w-full">
+            <div className="md:sticky md:top-6">
+              <ImageCarousel images={product.images} alt={product.title} className="shadow-sm rounded-2xl" priority={true} />
             </div>
           </div>
 
-          <div className="w-full mt-8 px-5 md:px-8 flex flex-col gap-5 text-left">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight leading-snug">{product.title}</h1>
-              {product.originalPrice ? (
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground font-medium line-through">{product.originalPrice}</span>
-                  <span className="text-[10px] md:text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">-{product.discountPercentage}</span>
-                </div>
-              ) : null}
-              <p className={`${product.originalPrice ? 'mt-1' : 'mt-2'} text-2xl font-extrabold text-primary`}>{product.price}</p>
-            </div>
+          {/* Right Column — Details & Action */}
+          <div className="flex flex-col gap-1 text-left items-start">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight leading-snug">
+              {product.title}
+            </h1>
 
-            <div className="border-t border-border pt-5 mt-2">
+            {product.originalPrice ? (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-lg text-muted-foreground font-medium line-through">{product.originalPrice}</span>
+                <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">-{product.discountPercentage}</span>
+              </div>
+            ) : null}
+            <p className={`${product.originalPrice ? 'mt-1' : 'mt-3'} text-3xl md:text-4xl font-extrabold text-primary`}>
+              {product.price}
+            </p>
+
+            <div className="w-full border-t border-border my-5 pt-5">
               <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{product.description}</p>
             </div>
 
@@ -82,7 +88,7 @@ export default function ProductDetail() {
               href={checkoutUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 mt-2 text-lg font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
             >
               <CheckoutIcon type={checkoutType} />
               Beli Sekarang
@@ -90,7 +96,9 @@ export default function ProductDetail() {
           </div>
         </article>
 
-        <section className="mt-8">
+        {/* Related Products — with elegant divider */}
+        <section className="mt-20 pt-8 border-t border-border">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6">Produk Lainnya</h2>
           <div className="grid grid-cols-2 gap-3">
             {visibleItems.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} />
