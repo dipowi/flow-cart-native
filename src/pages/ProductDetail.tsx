@@ -113,21 +113,23 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <a
-              href={checkoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl px-5 py-4 text-lg md:text-xl font-bold tracking-wide text-white transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
-                boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 15px 30px -5px hsla(25, 95%, 53%, 0.4)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)'; }}
-            >
-              <CheckoutIcon type={checkoutType} />
-              Beli Sekarang
-            </a>
+            <div className="hidden md:block w-full">
+              <a
+                href={checkoutUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl px-5 py-4 text-lg md:text-xl font-bold tracking-wide text-white transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+                style={{
+                  background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
+                  boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 15px 30px -5px hsla(25, 95%, 53%, 0.4)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)'; }}
+              >
+                <CheckoutIcon type={checkoutType} />
+                Beli Sekarang
+              </a>
+            </div>
             <div className="flex items-center justify-center gap-3 mt-4 w-full text-[13px] font-medium text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
@@ -179,33 +181,35 @@ export default function ProductDetail() {
       </div>
 
       {/* Omnipresent Sticky Bottom Bar */}
-      <div className="fixed bottom-0 left-0 w-full bg-background/90 backdrop-blur-md border-t border-border p-4 z-50 flex items-center justify-between md:justify-center gap-6 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.5)]">
-        <div className="hidden md:flex flex-col max-w-md">
-          <span className="text-sm text-muted-foreground truncate mb-0.5">{product.title}</span>
-          <div className="flex items-baseline gap-2">
-            <span className="text-xl font-black tracking-tight" style={{ color: 'hsl(25, 95%, 53%)' }}>
+      <div className="fixed bottom-0 left-0 w-full bg-background/95 backdrop-blur-md border-t border-border p-3 md:p-4 z-50 flex flex-row items-center justify-between gap-3 md:justify-center md:gap-6 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.5)]">
+        {/* Product Info — NOW VISIBLE ON MOBILE */}
+        <div className="flex flex-col flex-1 min-w-0">
+          <span className="hidden md:block text-sm text-muted-foreground truncate mb-0.5">{product.title}</span>
+          <div className="flex flex-col md:flex-row md:items-baseline gap-0 md:gap-2">
+            <span className="text-lg md:text-xl font-black tracking-tight truncate" style={{ color: 'hsl(25, 95%, 53%)' }}>
               {product.price}
             </span>
             {product.originalPrice && (
-              <>
-                <span className="text-sm text-muted-foreground line-through font-medium">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10.5px] md:text-sm text-muted-foreground line-through font-medium">
                   {product.originalPrice}
                 </span>
                 {product.discountPercentage && (
-                  <span className="text-[10px] font-bold text-white bg-destructive px-1.5 py-0.5 rounded shadow-sm">
+                  <span className="text-[9px] md:text-[10px] font-bold text-white bg-destructive px-1.5 py-0.5 rounded shadow-sm">
                     -{product.discountPercentage}
                   </span>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>
 
+        {/* CTA — Compact on Mobile, Large on Desktop */}
         <a
           href={checkoutUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full md:w-auto md:min-w-[250px] flex items-center justify-center gap-2 py-3.5 text-white font-bold text-lg rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+          className="flex-none w-[140px] sm:w-[160px] md:w-auto md:min-w-[250px] flex items-center justify-center gap-2 py-2.5 md:py-3.5 text-white font-bold text-sm md:text-lg rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
           style={{
             background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
             boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
