@@ -6,6 +6,10 @@ export interface StoreSettings {
   globalCheckoutTarget: string;
   globalCheckoutMessage: string | null;
   isHomepageRandom: boolean;
+  storeName: string;
+  storeDescription: string;
+  logoUrl: string | null;
+  headerAlignment: "left" | "center" | "right";
 }
 
 export interface Product {
@@ -140,6 +144,10 @@ export async function fetchStoreSettings(): Promise<StoreSettings | null> {
     globalCheckoutTarget: data.global_checkout_target,
     globalCheckoutMessage: data.global_checkout_message,
     isHomepageRandom: data.is_homepage_random ?? false,
+    storeName: (data as any).store_name ?? "Toko Cokotq",
+    storeDescription: (data as any).store_description ?? "Belanja mudah, harga bersahabat",
+    logoUrl: (data as any).logo_url ?? null,
+    headerAlignment: ((data as any).header_alignment ?? "left") as StoreSettings["headerAlignment"],
   };
 }
 

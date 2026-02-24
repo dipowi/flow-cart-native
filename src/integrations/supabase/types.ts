@@ -91,24 +91,36 @@ export type Database = {
           global_checkout_message: string | null
           global_checkout_target: string
           global_checkout_type: string
+          header_alignment: string
           id: string
           is_homepage_random: boolean
+          logo_url: string | null
+          store_description: string
+          store_name: string
           updated_at: string
         }
         Insert: {
           global_checkout_message?: string | null
           global_checkout_target?: string
           global_checkout_type?: string
+          header_alignment?: string
           id?: string
           is_homepage_random?: boolean
+          logo_url?: string | null
+          store_description?: string
+          store_name?: string
           updated_at?: string
         }
         Update: {
           global_checkout_message?: string | null
           global_checkout_target?: string
           global_checkout_type?: string
+          header_alignment?: string
           id?: string
           is_homepage_random?: boolean
+          logo_url?: string | null
+          store_description?: string
+          store_name?: string
           updated_at?: string
         }
         Relationships: []
