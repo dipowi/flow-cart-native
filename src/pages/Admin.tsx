@@ -216,6 +216,18 @@ const emptyForm: ProductFormData = {
   checkout_target: "", checkout_message: "", order_index: 0,
 };
 
+/** Parse "Rp 100.000" or "100000" → number */
+function parseRupiah(val: string): number {
+  const n = parseInt(val.replace(/[^\d]/g, ""), 10);
+  return isNaN(n) ? 0 : n;
+}
+
+/** Format number → "Rp 100.000" */
+function formatRupiah(n: number): string {
+  if (!n) return "";
+  return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(n);
+}
+
 function ProductFormDialog({ product, onClose }: { product?: any; onClose: () => void }) {
   const queryClient = useQueryClient();
   const isEdit = !!product;
@@ -241,6 +253,40 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
   });
 
   const set = (key: keyof ProductFormData, val: any) => setForm(prev => ({ ...prev, [key]: val }));
+
+  // ── Smart Pricing Calculator ──
+  const handlePriceChange = (raw: string) => {
+    const finalPrice = parseRupiah(raw);
+    const formatted = formatRupiah(finalPrice);
+    set("price", formatted);
+    // Auto-calc discount if original exists
+    const orig = parseRupiah(form.original_price);
+    if (orig > 0 && finalPrice > 0 && finalPrice < orig) {
+      set("discount_percentage", Math.round(((orig - finalPrice) / orig) * 100) + "%");
+    }
+  };
+
+  const handleOriginalPriceChange = (raw: string) => {
+    const orig = parseRupiah(raw);
+    const formatted = formatRupiah(orig);
+    set("original_price", formatted);
+    // Auto-calc discount if final exists
+    const finalPrice = parseRupiah(form.price);
+    if (orig > 0 && finalPrice > 0 && finalPrice < orig) {
+      set("discount_percentage", Math.round(((orig - finalPrice) / orig) * 100) + "%");
+    }
+  };
+
+  const handleDiscountChange = (raw: string) => {
+    const pct = parseInt(raw.replace(/[^\d]/g, ""), 10);
+    set("discount_percentage", isNaN(pct) ? "" : pct + "%");
+    // Auto-calc final price from original
+    const orig = parseRupiah(form.original_price);
+    if (orig > 0 && !isNaN(pct) && pct > 0 && pct < 100) {
+      const finalPrice = Math.round(orig * (1 - pct / 100));
+      set("price", formatRupiah(finalPrice));
+    }
+  };
 
   const addImageUrl = () => set("image_urls", [...form.image_urls, ""]);
   const removeImageUrl = (i: number) => set("image_urls", form.image_urls.filter((_, idx) => idx !== i));
@@ -293,36 +339,37 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Nama Produk *</Label>
-            <Input value={form.title} onChange={e => {
+            <Input value={form.title} maxLength={120} className="h-12" onChange={e => {
               const title = e.target.value;
               set("title", title);
               if (!isEdit || form.slug === generateSlug(form.title)) {
                 set("slug", generateSlug(title));
               }
             }} placeholder="Nama produk..." />
+            <p className="text-xs text-muted-foreground text-right">{form.title.length}/120</p>
           </div>
           <div className="space-y-2">
             <Label>Slug (URL)</Label>
-            <Input value={form.slug} onChange={e => set("slug", e.target.value)} placeholder="nama-produk" className="font-mono text-sm" />
+            <Input value={form.slug} onChange={e => set("slug", e.target.value)} placeholder="nama-produk" className="font-mono text-sm h-12" />
             <p className="text-xs text-muted-foreground">URL: /p/{form.slug || "..."}</p>
           </div>
           <div className="space-y-2">
             <Label>Deskripsi *</Label>
             <Textarea value={form.description} onChange={e => set("description", e.target.value)} rows={5} placeholder="Deskripsi produk..." />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label>Harga *</Label>
-              <Input value={form.price} onChange={e => set("price", e.target.value)} placeholder="Rp 45.000" />
-            </div>
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
               <Label>Harga Asli</Label>
-              <Input value={form.original_price} onChange={e => set("original_price", e.target.value)} placeholder="Rp 65.000" />
+              <Input value={form.original_price} onChange={e => handleOriginalPriceChange(e.target.value)} placeholder="Rp 65.000" className="h-12" />
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Diskon</Label>
-            <Input value={form.discount_percentage} onChange={e => set("discount_percentage", e.target.value)} placeholder="30%" />
+            <div className="space-y-2">
+              <Label>Diskon</Label>
+              <Input value={form.discount_percentage} onChange={e => handleDiscountChange(e.target.value)} placeholder="30%" className="h-12" />
+            </div>
+            <div className="space-y-2">
+              <Label>Harga Final *</Label>
+              <Input value={form.price} onChange={e => handlePriceChange(e.target.value)} placeholder="Rp 45.000" className="h-12 font-semibold text-primary" />
+            </div>
           </div>
         </div>
 
@@ -478,7 +525,7 @@ function ProductsTab() {
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Tambah Produk</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 md:p-8">
             <DialogHeader><DialogTitle>Tambah Produk Baru</DialogTitle></DialogHeader>
             <ProductFormDialog onClose={() => setShowAdd(false)} />
           </DialogContent>
@@ -550,7 +597,7 @@ function ProductsTab() {
                                       <Pencil className="h-4 w-4" />
                                     </Button>
                                   </DialogTrigger>
-                                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 md:p-8">
                                     <DialogHeader><DialogTitle>Edit Produk</DialogTitle></DialogHeader>
                                     <ProductFormDialog product={editProduct} onClose={() => setEditProduct(null)} />
                                   </DialogContent>
