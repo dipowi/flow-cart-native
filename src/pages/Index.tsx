@@ -1,4 +1,5 @@
 import { useProductFeed } from "@/hooks/useProducts";
+import { useStoreSettings } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
 import { Store } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -16,11 +17,43 @@ function SkeletonCard() {
   );
 }
 
+function DynamicHeader() {
+  const { data: settings } = useStoreSettings();
+
+  const name = settings?.storeName ?? "Toko Cokotq";
+  const desc = settings?.storeDescription ?? "Belanja mudah, harga bersahabat";
+  const logoUrl = settings?.logoUrl;
+  const align = settings?.headerAlignment ?? "left";
+
+  const alignClasses = {
+    left: "flex flex-row items-center text-left justify-start",
+    center: "flex flex-col items-center text-center justify-center",
+    right: "flex flex-row-reverse items-center text-right justify-start",
+  };
+
+  return (
+    <header className="mb-6 px-4 py-4 -mx-4 border-b border-border">
+      <div className={`gap-3 ${alignClasses[align]}`}>
+        {logoUrl ? (
+          <img src={logoUrl} alt={name} className="h-9 w-9 rounded-xl object-cover flex-shrink-0" />
+        ) : (
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary flex-shrink-0">
+            <Store className="h-5 w-5 text-primary-foreground" />
+          </div>
+        )}
+        <div>
+          <h1 className="text-lg font-bold text-foreground leading-tight">{name}</h1>
+          <p className="text-xs text-muted-foreground">{desc}</p>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export default function Index() {
   const { items, hasMore, loadMore, isLoading } = useProductFeed();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  // Intersection observer for infinite scroll - appends data
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || !hasMore) return;
@@ -35,20 +68,9 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[730px] px-4 pb-12">
-        <header className="mb-6 px-4 py-4 -mx-4 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <Store className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-card-foreground leading-tight">Toko Cokotq</h1>
-              <p className="text-xs text-muted-foreground">Belanja mudah, harga bersahabat</p>
-            </div>
-          </div>
-        </header>
+        <DynamicHeader />
 
         <main className="grid grid-cols-2 gap-3">
-          {/* Instant App Shell: show 4 skeletons while loading */}
           {isLoading && (
             <>
               <SkeletonCard />
@@ -58,7 +80,6 @@ export default function Index() {
             </>
           )}
 
-          {/* Actual products - using product.id as key for stable DOM */}
           {!isLoading && items.map((product) => (
             <ProductCard key={product.id} product={product} index={0} />
           ))}

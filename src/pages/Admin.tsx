@@ -2,8 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchStoreSettings } from "@/data/products";
+import type { StoreSettings } from "@/data/products";
 import AdminLogin from "./AdminLogin";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -14,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Package, Plus, Pencil, Trash2, LogOut, X, GripVertical, Pin } from "lucide-react";
+import { Settings, Package, Plus, Pencil, Trash2, LogOut, X, GripVertical, Pin, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 import { toast } from "sonner";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
 
@@ -30,6 +32,10 @@ function GlobalSettingsTab() {
   const [target, setTarget] = useState("");
   const [message, setMessage] = useState("");
   const [isRandom, setIsRandom] = useState(false);
+  const [storeName, setStoreName] = useState("");
+  const [storeDesc, setStoreDesc] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [headerAlign, setHeaderAlign] = useState<string>("left");
 
   useEffect(() => {
     if (settings) {
@@ -37,6 +43,10 @@ function GlobalSettingsTab() {
       setTarget(settings.globalCheckoutTarget);
       setMessage(settings.globalCheckoutMessage ?? "");
       setIsRandom(settings.isHomepageRandom);
+      setStoreName(settings.storeName ?? "");
+      setStoreDesc(settings.storeDescription ?? "");
+      setLogoUrl(settings.logoUrl ?? "");
+      setHeaderAlign(settings.headerAlignment ?? "left");
     }
   }, [settings]);
 
@@ -50,7 +60,11 @@ function GlobalSettingsTab() {
           global_checkout_target: target,
           global_checkout_message: message || null,
           is_homepage_random: isRandom,
-        })
+          store_name: storeName || "Toko Cokotq",
+          store_description: storeDesc || "Belanja mudah, harga bersahabat",
+          logo_url: logoUrl || null,
+          header_alignment: headerAlign,
+        } as any)
         .eq("id", settings.id);
       if (error) throw error;
     },
@@ -65,6 +79,53 @@ function GlobalSettingsTab() {
 
   return (
     <div className="space-y-6">
+      {/* Header Appearance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Tampilan Header</CardTitle>
+          <CardDescription>Atur nama toko, deskripsi, logo, dan posisi header di halaman utama.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Nama Toko</Label>
+              <Input value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="Toko Cokotq" />
+            </div>
+            <div className="space-y-2">
+              <Label>Deskripsi Toko</Label>
+              <Input value={storeDesc} onChange={e => setStoreDesc(e.target.value)} placeholder="Belanja mudah, harga bersahabat" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>URL Logo (opsional)</Label>
+            <Input value={logoUrl} onChange={e => setLogoUrl(e.target.value)} placeholder="https://..." />
+            {logoUrl && (
+              <div className="mt-2">
+                <img src={logoUrl} alt="Preview" className="h-10 w-10 rounded-xl object-cover bg-muted" />
+              </div>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label>Posisi Header</Label>
+            <ToggleGroup type="single" value={headerAlign} onValueChange={v => v && setHeaderAlign(v)} className="justify-start">
+              <ToggleGroupItem value="left" aria-label="Kiri" className="gap-1.5">
+                <AlignLeft className="h-4 w-4" /> Kiri
+              </ToggleGroupItem>
+              <ToggleGroupItem value="center" aria-label="Tengah" className="gap-1.5">
+                <AlignCenter className="h-4 w-4" /> Tengah
+              </ToggleGroupItem>
+              <ToggleGroupItem value="right" aria-label="Kanan" className="gap-1.5">
+                <AlignRight className="h-4 w-4" /> Kanan
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+          <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+            {mutation.isPending ? "Menyimpan..." : "Simpan Pengaturan"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Checkout Settings */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Pengaturan Checkout Global</CardTitle>
@@ -98,6 +159,7 @@ function GlobalSettingsTab() {
         </CardContent>
       </Card>
 
+      {/* Homepage Display */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Pengaturan Tampilan Beranda</CardTitle>
