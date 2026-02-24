@@ -79,7 +79,7 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[960px] px-4 pb-12">
+      <div className="mx-auto max-w-[960px] px-4 pb-28 md:pb-32">
         {/* Split-Pane: 1 col mobile, 2 col desktop */}
         <article className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 items-start">
           {/* Left Column — Sticky Visuals */}
@@ -176,6 +176,30 @@ export default function ProductDetail() {
             {hasMore && <div ref={sentinelRef} className="col-span-2 h-1" />}
           </div>
         </section>
+      </div>
+
+      {/* Omnipresent Sticky Bottom Bar */}
+      <div className="fixed bottom-0 left-0 w-full bg-background/90 backdrop-blur-md border-t border-border p-4 z-50 flex items-center justify-between md:justify-center gap-6 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.5)]">
+        <div className="hidden md:flex flex-col max-w-md">
+          <span className="text-sm text-muted-foreground truncate">{product.title}</span>
+          <span className="text-xl font-black tracking-tight" style={{ color: 'hsl(25, 95%, 53%)' }}>
+            {product.price}
+          </span>
+        </div>
+
+        <a
+          href={checkoutUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full md:w-auto md:min-w-[250px] flex items-center justify-center gap-2 py-3.5 text-white font-bold text-lg rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+          style={{
+            background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
+            boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
+          }}
+        >
+          <CheckoutIcon type={checkoutType} />
+          Beli Sekarang
+        </a>
       </div>
     </div>
   );
