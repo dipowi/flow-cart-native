@@ -61,13 +61,13 @@ export default function ProductDetail() {
         {/* Split-Pane: 1 col mobile, 2 col desktop */}
         <article className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 items-start">
           {/* Left Column — Sticky Visuals */}
-          <div className="w-full md:sticky md:top-6 md:self-start">
+          <div className="w-full md:sticky md:top-24 md:self-start">
             <ImageCarousel images={product.images} alt={product.title} className="shadow-sm rounded-2xl" priority={true} />
           </div>
 
           {/* Right Column — Details & Action */}
           <div className="flex flex-col gap-1 text-left items-start">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight leading-tight">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight md:leading-snug tracking-tight">
               {product.title}
             </h1>
 
@@ -82,17 +82,21 @@ export default function ProductDetail() {
             </p>
 
             <div className="w-full border-t border-border my-5 pt-5">
-              <div className={`relative ${!isDescExpanded ? 'line-clamp-4' : ''}`}>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap">{product.description}</p>
+              <div className="relative">
+                <div className={`text-base md:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap overflow-hidden transition-all duration-300 ${isDescExpanded ? 'max-h-[2000px]' : 'max-h-32'}`}>
+                  {product.description}
+                </div>
+                {!isDescExpanded && (
+                  <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-background to-transparent" />
+                )}
               </div>
-              {product.description && product.description.length > 200 && (
-                <button
-                  onClick={() => setIsDescExpanded(!isDescExpanded)}
-                  className="text-sm text-muted-foreground hover:text-foreground mt-2 transition-colors"
-                >
-                  {isDescExpanded ? 'Tutup' : 'Baca Selengkapnya...'}
-                </button>
-              )}
+              <button
+                onClick={() => setIsDescExpanded(!isDescExpanded)}
+                className="text-sm font-semibold mt-2 transition-colors hover:opacity-80"
+                style={{ color: 'hsl(25, 95%, 53%)' }}
+              >
+                {isDescExpanded ? 'Tutup Deskripsi' : 'Baca Selengkapnya...'}
+              </button>
             </div>
 
             <a
