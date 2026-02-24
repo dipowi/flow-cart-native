@@ -83,21 +83,25 @@ export default function ProductDetail() {
               {product.title}
             </h1>
 
-            {/* Discount Wrapper — fixed height to prevent layout shifts */}
-            <div className="h-6 md:h-8 flex items-center gap-2 mt-2">
+            {/* Unified Pricing Block — Inline Baseline Anchor */}
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mt-4 mb-6">
+              <span className="text-4xl md:text-5xl font-black tracking-tight" style={{ color: 'hsl(25, 95%, 53%)' }}>
+                {product.price}
+              </span>
+
               {product.originalPrice && (
-                <>
-                  <span className="text-sm md:text-base text-muted-foreground font-medium line-through">{product.originalPrice}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg md:text-xl text-muted-foreground line-through font-medium">
+                    {product.originalPrice}
+                  </span>
                   {product.discountPercentage && (
-                    <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">-{product.discountPercentage}</span>
+                    <span className="text-xs font-bold text-white bg-destructive px-2 py-1 rounded-md shadow-sm">
+                      -{product.discountPercentage}
+                    </span>
                   )}
-                </>
+                </div>
               )}
             </div>
-
-            <p className="text-4xl md:text-5xl font-black tracking-tight mt-1" style={{ color: 'hsl(25, 95%, 53%)' }}>
-              {product.price}
-            </p>
 
             <a
               href={checkoutUrl}
