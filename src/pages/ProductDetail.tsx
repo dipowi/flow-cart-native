@@ -79,17 +79,23 @@ export default function ProductDetail() {
 
           {/* Right Column — Details & Action */}
           <div className="flex flex-col justify-start items-start h-full pt-2 md:pt-4">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight md:leading-snug tracking-tight line-clamp-3 min-h-[2.5rem] md:min-h-[3rem]">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight tracking-tight line-clamp-2 min-h-[3.5rem] md:min-h-[4.5rem] flex items-start">
               {product.title}
             </h1>
 
-            {product.originalPrice ? (
-              <div className="mt-2 md:mt-4 flex items-center gap-2">
-                <span className="text-xl text-muted-foreground font-medium line-through">{product.originalPrice}</span>
-                <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">-{product.discountPercentage}</span>
-              </div>
-            ) : null}
-            <p className={`${product.originalPrice ? 'mt-1' : 'mt-2 md:mt-4'} text-4xl md:text-5xl font-black tracking-tight`} style={{ color: 'hsl(25, 95%, 53%)' }}>
+            {/* Discount Wrapper — fixed height to prevent layout shifts */}
+            <div className="h-6 md:h-8 flex items-center gap-2 mt-2">
+              {product.originalPrice && (
+                <>
+                  <span className="text-sm md:text-base text-muted-foreground font-medium line-through">{product.originalPrice}</span>
+                  {product.discountPercentage && (
+                    <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">-{product.discountPercentage}</span>
+                  )}
+                </>
+              )}
+            </div>
+
+            <p className="text-4xl md:text-5xl font-black tracking-tight mt-1" style={{ color: 'hsl(25, 95%, 53%)' }}>
               {product.price}
             </p>
 
