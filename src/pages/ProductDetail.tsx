@@ -197,24 +197,26 @@ export default function ProductDetail() {
 
       {/* Omnipresent Sticky Bottom Bar */}
       <div className={`fixed bottom-0 left-0 w-full bg-background/95 backdrop-blur-md border-t border-border p-3 md:p-4 z-50 flex flex-row items-center justify-between gap-3 md:justify-center md:gap-6 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.5)] transform transition-all duration-500 ease-in-out ${showStickyBar ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
-        {/* Product Info — NOW VISIBLE ON MOBILE */}
-        <div className="flex flex-col flex-1 min-w-0">
-          <span className="hidden md:block text-sm text-muted-foreground truncate mb-0.5">{product.title}</span>
-          <div className="flex flex-col md:flex-row md:items-baseline gap-0 md:gap-2">
-            <span className="text-lg md:text-xl font-black tracking-tight truncate" style={{ color: 'hsl(25, 95%, 53%)' }}>
+        {/* Left Column: Micro-Context & Pricing */}
+        <div className="flex flex-col flex-1 min-w-0 mr-2 md:mr-6 justify-center">
+          <span className="text-[10px] md:text-sm text-muted-foreground truncate block w-full leading-tight mb-0.5">
+            {product.title}
+          </span>
+          <div className="flex items-baseline gap-1.5 md:gap-2 flex-wrap">
+            <span className="text-base sm:text-lg md:text-xl font-black tracking-tight leading-none" style={{ color: 'hsl(25, 95%, 53%)' }}>
               {product.price}
             </span>
             {product.originalPrice && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10.5px] md:text-sm text-muted-foreground line-through font-medium">
+              <>
+                <span className="text-[9px] md:text-[13px] text-muted-foreground line-through font-medium">
                   {product.originalPrice}
                 </span>
                 {product.discountPercentage && (
-                  <span className="text-[9px] md:text-[10px] font-bold text-white bg-destructive px-1.5 py-0.5 rounded shadow-sm">
+                  <span className="text-[8px] md:text-[10px] font-bold text-white bg-destructive px-1 py-0.5 rounded-sm shadow-sm leading-none">
                     -{product.discountPercentage}
                   </span>
                 )}
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -224,7 +226,7 @@ export default function ProductDetail() {
           href={checkoutUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-none w-[140px] sm:w-[160px] md:w-auto md:min-w-[250px] flex items-center justify-center gap-2 py-2.5 md:py-3.5 text-white font-bold text-sm md:text-lg rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+          className="flex-none px-4 md:px-8 py-2.5 md:py-3.5 flex items-center justify-center gap-2 text-white font-bold text-sm md:text-lg rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
           style={{
             background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
             boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
