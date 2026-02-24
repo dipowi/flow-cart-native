@@ -5,7 +5,7 @@ import { useProductBySlug, useDiscoveryQueue, useStoreSettings } from "@/hooks/u
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
 import ImageCarousel from "@/components/ImageCarousel";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function CheckoutIcon({ type }: { type: string }) {
   switch (type) {
@@ -23,7 +23,10 @@ export default function ProductDetail() {
   const product = passedProduct ?? fetchedProduct ?? null;
   const { data: storeSettings } = useStoreSettings();
 
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
+
   useEffect(() => {
+    setIsDescExpanded(false);
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [slug]);
 
@@ -56,12 +59,10 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[960px] px-4 pb-12">
         {/* Split-Pane: 1 col mobile, 2 col desktop */}
-        <article className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
-          {/* Left Column — Visuals */}
-          <div className="w-full">
-            <div className="md:sticky md:top-6">
-              <ImageCarousel images={product.images} alt={product.title} className="shadow-sm rounded-2xl" priority={true} />
-            </div>
+        <article className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 items-start">
+          {/* Left Column — Sticky Visuals */}
+          <div className="w-full md:sticky md:top-6 md:self-start">
+            <ImageCarousel images={product.images} alt={product.title} className="shadow-sm rounded-2xl" priority={true} />
           </div>
 
           {/* Right Column — Details & Action */}
@@ -81,7 +82,17 @@ export default function ProductDetail() {
             </p>
 
             <div className="w-full border-t border-border my-5 pt-5">
-              <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{product.description}</p>
+              <div className={`relative ${!isDescExpanded ? 'line-clamp-4' : ''}`}>
+                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{product.description}</p>
+              </div>
+              {product.description && product.description.length > 200 && (
+                <button
+                  onClick={() => setIsDescExpanded(!isDescExpanded)}
+                  className="text-sm text-muted-foreground hover:text-foreground mt-2 transition-colors"
+                >
+                  {isDescExpanded ? 'Tutup' : 'Baca Selengkapnya...'}
+                </button>
+              )}
             </div>
 
             <a
@@ -96,9 +107,8 @@ export default function ProductDetail() {
           </div>
         </article>
 
-        {/* Related Products — with elegant divider */}
-        <section className="mt-20 pt-8 border-t border-border">
-          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6">Produk Lainnya</h2>
+        {/* Seamless feed — no title, no divider */}
+        <section className="mt-16">
           <div className="grid grid-cols-2 gap-3">
             {visibleItems.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} />
