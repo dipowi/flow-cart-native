@@ -5,7 +5,7 @@ import { useProductBySlug, useDiscoveryQueue, useStoreSettings } from "@/hooks/u
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
 import ImageCarousel from "@/components/ImageCarousel";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 function CheckoutIcon({ type }: { type: string }) {
   switch (type) {
@@ -23,7 +23,19 @@ export default function ProductDetail() {
   const product = passedProduct ?? fetchedProduct ?? null;
   const { data: storeSettings } = useStoreSettings();
 
+  const descriptionRef = useRef<HTMLDivElement>(null);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
+
+  const handleToggleDescription = () => {
+    if (isDescExpanded) {
+      setIsDescExpanded(false);
+      setTimeout(() => {
+        descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    } else {
+      setIsDescExpanded(true);
+    }
+  };
 
   useEffect(() => {
     setIsDescExpanded(false);
@@ -81,7 +93,7 @@ export default function ProductDetail() {
               {product.price}
             </p>
 
-            <div className="w-full border-t border-border my-5 pt-5">
+            <div ref={descriptionRef} className="w-full border-t border-border my-5 pt-5 scroll-mt-24">
               <div className="relative">
                 <div className={`text-base md:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap overflow-hidden transition-all duration-300 ${isDescExpanded ? 'max-h-[2000px]' : 'max-h-32'}`}>
                   {product.description}
@@ -91,7 +103,7 @@ export default function ProductDetail() {
                 )}
               </div>
               <button
-                onClick={() => setIsDescExpanded(!isDescExpanded)}
+                onClick={handleToggleDescription}
                 className="text-sm font-semibold mt-2 transition-colors hover:opacity-80"
                 style={{ color: 'hsl(25, 95%, 53%)' }}
               >
