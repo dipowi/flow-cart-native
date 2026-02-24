@@ -67,23 +67,23 @@ export default function ProductDetail() {
 
           {/* Right Column — Details & Action */}
           <div className="flex flex-col gap-1 text-left items-start">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight leading-snug">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight leading-tight">
               {product.title}
             </h1>
 
             {product.originalPrice ? (
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-lg text-muted-foreground font-medium line-through">{product.originalPrice}</span>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-xl text-muted-foreground font-medium line-through">{product.originalPrice}</span>
                 <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-md">-{product.discountPercentage}</span>
               </div>
             ) : null}
-            <p className={`${product.originalPrice ? 'mt-1' : 'mt-3'} text-3xl md:text-4xl font-extrabold text-primary`}>
+            <p className={`${product.originalPrice ? 'mt-1' : 'mt-3'} text-4xl md:text-5xl font-black tracking-tight`} style={{ color: 'hsl(25, 95%, 53%)' }}>
               {product.price}
             </p>
 
             <div className="w-full border-t border-border my-5 pt-5">
               <div className={`relative ${!isDescExpanded ? 'line-clamp-4' : ''}`}>
-                <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">{product.description}</p>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap">{product.description}</p>
               </div>
               {product.description && product.description.length > 200 && (
                 <button
@@ -99,11 +99,22 @@ export default function ProductDetail() {
               href={checkoutUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl px-5 py-4 text-lg md:text-xl font-bold tracking-wide text-white transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+              style={{
+                background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
+                boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 15px 30px -5px hsla(25, 95%, 53%, 0.4)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)'; }}
             >
               <CheckoutIcon type={checkoutType} />
               Beli Sekarang
             </a>
+            <div className="flex items-center justify-center gap-2 mt-4 w-full text-xs font-medium text-muted-foreground">
+              <span>🔒 Transaksi Aman & Langsung</span>
+              <span>•</span>
+              <span>⚡ Respon Cepat</span>
+            </div>
           </div>
         </article>
 
