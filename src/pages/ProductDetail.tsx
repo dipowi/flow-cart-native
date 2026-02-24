@@ -181,10 +181,24 @@ export default function ProductDetail() {
       {/* Omnipresent Sticky Bottom Bar */}
       <div className="fixed bottom-0 left-0 w-full bg-background/90 backdrop-blur-md border-t border-border p-4 z-50 flex items-center justify-between md:justify-center gap-6 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.5)]">
         <div className="hidden md:flex flex-col max-w-md">
-          <span className="text-sm text-muted-foreground truncate">{product.title}</span>
-          <span className="text-xl font-black tracking-tight" style={{ color: 'hsl(25, 95%, 53%)' }}>
-            {product.price}
-          </span>
+          <span className="text-sm text-muted-foreground truncate mb-0.5">{product.title}</span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-xl font-black tracking-tight" style={{ color: 'hsl(25, 95%, 53%)' }}>
+              {product.price}
+            </span>
+            {product.originalPrice && (
+              <>
+                <span className="text-sm text-muted-foreground line-through font-medium">
+                  {product.originalPrice}
+                </span>
+                {product.discountPercentage && (
+                  <span className="text-[10px] font-bold text-white bg-destructive px-1.5 py-0.5 rounded shadow-sm">
+                    -{product.discountPercentage}
+                  </span>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         <a
