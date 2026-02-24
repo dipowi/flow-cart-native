@@ -25,9 +25,15 @@ function DynamicHeader() {
   const align = settings?.headerAlignment ?? "left";
 
   const alignClasses = {
-    left: "flex flex-row items-center justify-start gap-3 md:gap-4 text-left",
-    center: "flex flex-row items-center justify-center gap-3 md:gap-4 text-left",
-    right: "flex flex-row items-center justify-end gap-3 md:gap-4 text-right",
+    left: "flex flex-row items-center justify-start gap-3 md:gap-4",
+    center: "flex flex-row items-center justify-center gap-3 md:gap-4",
+    right: "flex flex-row items-center justify-end gap-3 md:gap-4",
+  };
+
+  const textAlignClasses = {
+    left: "flex flex-col items-start text-left",
+    center: "flex flex-col items-center text-center",
+    right: "flex flex-col items-end text-right",
   };
 
   return (
@@ -36,7 +42,7 @@ function DynamicHeader() {
         {logoUrl && (
           <img src={logoUrl} alt={name} className="h-10 w-auto object-contain flex-shrink-0" />
         )}
-        <div>
+        <div className={textAlignClasses[align]}>
           <h1 className="text-xl font-extrabold text-foreground tracking-tight leading-tight">{name}</h1>
           <p className="text-sm text-muted-foreground">{desc}</p>
         </div>
