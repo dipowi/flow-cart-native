@@ -339,14 +339,14 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Nama Produk *</Label>
-            <Input value={form.title} maxLength={60} className="h-12" onChange={e => {
+            <Input value={form.title} maxLength={50} className="h-12" onChange={e => {
               const title = e.target.value;
               set("title", title);
               if (!isEdit || form.slug === generateSlug(form.title)) {
                 set("slug", generateSlug(title));
               }
             }} placeholder="Nama produk..." />
-            <p className="text-xs text-muted-foreground text-right">{form.title.length}/60</p>
+            <p className="text-xs text-muted-foreground text-right">{form.title.length}/50</p>
           </div>
           <div className="space-y-2">
             <Label>Slug (URL)</Label>
