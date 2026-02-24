@@ -27,6 +27,21 @@ export default function ProductDetail() {
   const textRef = useRef<HTMLDivElement>(null);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const topCtaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyBar(!entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: "-80px 0px 0px 0px" }
+    );
+    if (topCtaRef.current) {
+      observer.observe(topCtaRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
 
   const handleToggleDescription = useCallback(() => {
     if (isDescExpanded) {
@@ -113,7 +128,7 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <div className="hidden md:block w-full">
+            <div ref={topCtaRef} className="w-full">
               <a
                 href={checkoutUrl}
                 target="_blank"
@@ -129,16 +144,16 @@ export default function ProductDetail() {
                 <CheckoutIcon type={checkoutType} />
                 Beli Sekarang
               </a>
-            </div>
-            <div className="flex items-center justify-center gap-3 mt-4 w-full text-[13px] font-medium text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                <span>Transaksi Aman Terverifikasi</span>
-              </div>
-              <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-              <div className="flex items-center gap-1.5">
-                <Zap className="w-4 h-4" style={{ color: 'hsl(25, 95%, 53%)' }} />
-                <span>Respon Instan</span>
+              <div className="flex items-center justify-center gap-3 mt-4 w-full text-[13px] font-medium text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>Transaksi Aman Terverifikasi</span>
+                </div>
+                <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+                <div className="flex items-center gap-1.5">
+                  <Zap className="w-4 h-4" style={{ color: 'hsl(25, 95%, 53%)' }} />
+                  <span>Respon Instan</span>
+                </div>
               </div>
             </div>
 
@@ -181,7 +196,7 @@ export default function ProductDetail() {
       </div>
 
       {/* Omnipresent Sticky Bottom Bar */}
-      <div className="fixed bottom-0 left-0 w-full bg-background/95 backdrop-blur-md border-t border-border p-3 md:p-4 z-50 flex flex-row items-center justify-between gap-3 md:justify-center md:gap-6 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.5)]">
+      <div className={`fixed bottom-0 left-0 w-full bg-background/95 backdrop-blur-md border-t border-border p-3 md:p-4 z-50 flex flex-row items-center justify-between gap-3 md:justify-center md:gap-6 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.5)] transform transition-all duration-500 ease-in-out ${showStickyBar ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
         {/* Product Info — NOW VISIBLE ON MOBILE */}
         <div className="flex flex-col flex-1 min-w-0">
           <span className="hidden md:block text-sm text-muted-foreground truncate mb-0.5">{product.title}</span>
