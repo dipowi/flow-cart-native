@@ -89,6 +89,7 @@ export default function ProductDetail() {
     );
   }
 
+  const isSoldOut = product.isSoldOut;
   const checkoutUrl = getCheckoutUrl(product, storeSettings);
   const checkoutType = product.checkout?.type ?? storeSettings?.globalCheckoutType ?? "link";
 
@@ -129,32 +130,43 @@ export default function ProductDetail() {
             </div>
 
             <div ref={topCtaRef} className="w-full">
-              <a
-                href={checkoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl px-5 py-4 text-lg md:text-xl font-bold tracking-wide text-white transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
-                style={{
-                  background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
-                  boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 15px 30px -5px hsla(25, 95%, 53%, 0.4)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)'; }}
-              >
-                <CheckoutIcon type={checkoutType} />
-                Beli Sekarang
-              </a>
-              <div className="flex items-center justify-center gap-3 mt-4 w-full text-[13px] font-medium text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                  <span>Transaksi Aman Terverifikasi</span>
-                </div>
-                <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-                <div className="flex items-center gap-1.5">
-                  <Zap className="w-4 h-4" style={{ color: 'hsl(25, 95%, 53%)' }} />
-                  <span>Respon Instan</span>
-                </div>
-              </div>
+              {isSoldOut ? (
+                <>
+                  <button disabled className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl px-5 py-4 text-lg md:text-xl font-bold tracking-wide bg-secondary text-muted-foreground cursor-not-allowed border border-border">
+                    Stok Habis
+                  </button>
+                  <span className="text-muted-foreground text-sm flex justify-center mt-4">Nantikan restock selanjutnya.</span>
+                </>
+              ) : (
+                <>
+                  <a
+                    href={checkoutUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl px-5 py-4 text-lg md:text-xl font-bold tracking-wide text-white transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+                    style={{
+                      background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
+                      boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 15px 30px -5px hsla(25, 95%, 53%, 0.4)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)'; }}
+                  >
+                    <CheckoutIcon type={checkoutType} />
+                    Beli Sekarang
+                  </a>
+                  <div className="flex items-center justify-center gap-3 mt-4 w-full text-[13px] font-medium text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                      <span>Transaksi Aman Terverifikasi</span>
+                    </div>
+                    <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+                    <div className="flex items-center gap-1.5">
+                      <Zap className="w-4 h-4" style={{ color: 'hsl(25, 95%, 53%)' }} />
+                      <span>Respon Instan</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="w-full border-b border-border my-8" />
@@ -196,51 +208,50 @@ export default function ProductDetail() {
       </div>
 
       {/* Floating Conversion Island */}
-      <div
-        className={`fixed z-50 left-0 w-full flex justify-center transition-all duration-500 ease-out pointer-events-none
-        ${showStickyBar ? 'bottom-0 md:bottom-8 opacity-100' : '-bottom-32 opacity-0'}`}
-      >
-        <div className="pointer-events-auto w-full md:w-[750px] md:max-w-[90vw] bg-background/95 backdrop-blur-xl border-t md:border border-border p-3 md:p-4 md:rounded-2xl shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.6)] flex items-center justify-between gap-4">
-          {/* Left: Micro-Context & Pricing */}
-          <div className="flex flex-col flex-1 min-w-0 md:pl-2">
-            <span className="text-[10px] md:text-xs text-muted-foreground truncate block w-full leading-tight mb-0.5">
-              {product.title}
-            </span>
-            <div className="flex items-baseline gap-1.5 md:gap-2 flex-wrap">
-              <span className="text-base sm:text-lg md:text-2xl font-black tracking-tight leading-none" style={{ color: 'hsl(25, 95%, 53%)' }}>
-                {product.price}
+      {!isSoldOut && (
+        <div
+          className={`fixed z-50 left-0 w-full flex justify-center transition-all duration-500 ease-out pointer-events-none
+          ${showStickyBar ? 'bottom-0 md:bottom-8 opacity-100' : '-bottom-32 opacity-0'}`}
+        >
+          <div className="pointer-events-auto w-full md:w-[750px] md:max-w-[90vw] bg-background/95 backdrop-blur-xl border-t md:border border-border p-3 md:p-4 md:rounded-2xl shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.6)] flex items-center justify-between gap-4">
+            <div className="flex flex-col flex-1 min-w-0 md:pl-2">
+              <span className="text-[10px] md:text-xs text-muted-foreground truncate block w-full leading-tight mb-0.5">
+                {product.title}
               </span>
-              {product.originalPrice && (
-                <>
-                  <span className="text-[9px] md:text-sm text-muted-foreground line-through font-medium">
-                    {product.originalPrice}
-                  </span>
-                  {product.discountPercentage && (
-                    <span className="text-[8px] md:text-xs font-bold text-white bg-destructive px-1.5 py-0.5 rounded-sm shadow-sm leading-none">
-                      -{product.discountPercentage}
+              <div className="flex items-baseline gap-1.5 md:gap-2 flex-wrap">
+                <span className="text-base sm:text-lg md:text-2xl font-black tracking-tight leading-none" style={{ color: 'hsl(25, 95%, 53%)' }}>
+                  {product.price}
+                </span>
+                {product.originalPrice && (
+                  <>
+                    <span className="text-[9px] md:text-sm text-muted-foreground line-through font-medium">
+                      {product.originalPrice}
                     </span>
-                  )}
-                </>
-              )}
+                    {product.discountPercentage && (
+                      <span className="text-[8px] md:text-xs font-bold text-white bg-destructive px-1.5 py-0.5 rounded-sm shadow-sm leading-none">
+                        -{product.discountPercentage}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
+            <a
+              href={checkoutUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-none px-6 md:px-10 py-2.5 md:py-3.5 flex items-center justify-center gap-2 text-white font-bold text-sm md:text-lg rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
+              style={{
+                background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
+                boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
+              }}
+            >
+              <CheckoutIcon type={checkoutType} />
+              Beli Sekarang
+            </a>
           </div>
-
-          {/* Right: CTA */}
-          <a
-            href={checkoutUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-none px-6 md:px-10 py-2.5 md:py-3.5 flex items-center justify-center gap-2 text-white font-bold text-sm md:text-lg rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]"
-            style={{
-              background: 'linear-gradient(to right, hsl(25, 95%, 53%), hsl(20, 90%, 48%))',
-              boxShadow: '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)',
-            }}
-          >
-            <CheckoutIcon type={checkoutType} />
-            Beli Sekarang
-          </a>
         </div>
-      </div>
+      )}
     </div>
   );
 }

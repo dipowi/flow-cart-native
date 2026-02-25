@@ -24,6 +24,8 @@ export interface Product {
   tags: string[];
   isPinned: boolean;
   orderIndex: number;
+  isActive: boolean;
+  isSoldOut: boolean;
   checkout: {
     type: "whatsapp" | "telegram" | "link";
     target: string;
@@ -46,6 +48,8 @@ function mapRow(row: any): Product {
     tags: row.tags ?? [],
     isPinned: row.is_pinned ?? false,
     orderIndex: row.order_index ?? 0,
+    isActive: row.is_active ?? true,
+    isSoldOut: row.is_sold_out ?? false,
     checkout: hasCustomCheckout
       ? {
           type: row.checkout_type as "whatsapp" | "telegram" | "link",
@@ -61,6 +65,7 @@ export async function fetchProducts(from: number, to: number): Promise<Product[]
   const { data, error } = await supabase
     .from("products")
     .select("*")
+    .eq("is_active", true)
     .order("is_pinned", { ascending: false })
     .order("order_index", { ascending: true })
     .range(from, to);
@@ -94,7 +99,8 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
 export async function fetchProductCount(): Promise<number> {
   const { count, error } = await supabase
     .from("products")
-    .select("*", { count: "exact", head: true });
+    .select("*", { count: "exact", head: true })
+    .eq("is_active", true);
   if (error) throw error;
   return count ?? 0;
 }
@@ -105,6 +111,7 @@ export async function fetchRelatedProducts(currentId: string, tags: string[]): P
     .from("products")
     .select("*")
     .neq("id", currentId)
+    .eq("is_active", true)
     .overlaps("tags", tags)
     .order("is_pinned", { ascending: false })
     .order("order_index", { ascending: true })
@@ -119,6 +126,7 @@ export async function fetchDiscoveryQueue(currentId: string, tags: string[]): Pr
     .from("products")
     .select("*")
     .neq("id", currentId)
+    .eq("is_active", true)
     .order("is_pinned", { ascending: false })
     .order("order_index", { ascending: true });
   if (error) throw error;

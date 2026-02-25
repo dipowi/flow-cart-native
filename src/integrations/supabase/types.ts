@@ -39,7 +39,9 @@ export type Database = {
           discount_percentage: string | null
           id: string
           image_urls: string[]
+          is_active: boolean
           is_pinned: boolean
+          is_sold_out: boolean
           order_index: number
           original_price: string | null
           price: string
@@ -57,7 +59,9 @@ export type Database = {
           discount_percentage?: string | null
           id?: string
           image_urls?: string[]
+          is_active?: boolean
           is_pinned?: boolean
+          is_sold_out?: boolean
           order_index?: number
           original_price?: string | null
           price: string
@@ -75,7 +79,9 @@ export type Database = {
           discount_percentage?: string | null
           id?: string
           image_urls?: string[]
+          is_active?: boolean
           is_pinned?: boolean
+          is_sold_out?: boolean
           order_index?: number
           original_price?: string | null
           price?: string
