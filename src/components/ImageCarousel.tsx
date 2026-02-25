@@ -72,6 +72,9 @@ export default function ImageCarousel({ images, alt, className = "", priority = 
           ))}
         </div>
 
+        {/* Contrast Mask — guarantees dot visibility on bright images */}
+        <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-10" />
+
         {/* Glassmorphism Hover Arrows — Desktop Only */}
         <button
           onClick={() => scrollToSlide(activeIndex === 0 ? images.length - 1 : activeIndex - 1)}
@@ -88,16 +91,16 @@ export default function ImageCarousel({ images, alt, className = "", priority = 
           <ChevronRight className="w-5 h-5" />
         </button>
 
-        {/* Dynamic Pill Indicators */}
-        <div className="absolute bottom-3 left-0 w-full flex justify-center items-center gap-1.5 z-10">
+        {/* Dynamic Pill Indicators — Mobile-First, always visible */}
+        <div className="absolute bottom-3 md:bottom-5 left-0 w-full flex justify-center items-center gap-1.5 md:gap-2 z-20">
           {images.map((_, i) => (
             <button
               key={i}
               onClick={() => scrollToSlide(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ease-out ${
+              className={`h-1.5 md:h-2 rounded-full transition-all duration-300 ease-out ${
                 i === activeIndex
-                  ? "w-6 bg-primary shadow-[0_0_8px_hsla(var(--primary)/0.8)]"
-                  : "w-1.5 bg-primary-foreground/40 hover:bg-primary-foreground/60"
+                  ? "w-5 md:w-8 bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.9)]"
+                  : "w-1.5 md:w-2 bg-white/60 hover:bg-white/90"
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />
