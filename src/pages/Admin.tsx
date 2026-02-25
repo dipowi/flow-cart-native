@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Package, Plus, Pencil, Trash2, LogOut, X, GripVertical, Pin, AlignLeft, AlignCenter, AlignRight, Eye, EyeOff, PackageX } from "lucide-react";
+import { Settings, Package, Plus, Pencil, Trash2, LogOut, X, GripVertical, Pin, AlignLeft, AlignCenter, AlignRight, Eye, EyeOff, PackageX, CheckCircle, XCircle, Search, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
 
@@ -176,6 +176,74 @@ function GlobalSettingsTab() {
           <Button onClick={() => mutation.mutate()} disabled={mutation.isPending} className="mt-4">
             {mutation.isPending ? "Menyimpan..." : "Simpan Pengaturan"}
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* SEO & Social Preview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Search className="h-5 w-5" /> Preview SEO & Sosial Media
+          </CardTitle>
+          <CardDescription>Begini tampilan toko Anda di Google & WhatsApp berdasarkan pengaturan di atas.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Google Search Preview */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Google Search Preview</p>
+            <div className="rounded-lg border border-border p-4 space-y-1 bg-card">
+              <p className="text-lg leading-snug" style={{ color: "#1a0dab" }}>
+                {storeName || "Nama Toko"} — {storeDesc || "Deskripsi toko"}
+              </p>
+              <p className="text-sm" style={{ color: "#006621" }}>soyo.lovable.app</p>
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {storeDesc || "Deskripsi toko Anda akan muncul di sini. Isi di kolom Deskripsi Toko di atas."}
+              </p>
+            </div>
+          </div>
+
+          {/* WhatsApp Preview */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <MessageCircle className="h-3.5 w-3.5" /> WhatsApp / Social Preview
+            </p>
+            <div className="rounded-lg border border-border bg-muted p-3 flex gap-3 items-start max-w-sm">
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo" className="h-16 w-16 rounded-md object-cover shrink-0 bg-background" />
+              ) : (
+                <div className="h-16 w-16 rounded-md bg-background flex items-center justify-center shrink-0">
+                  <span className="text-[10px] text-muted-foreground font-medium">LOGO</span>
+                </div>
+              )}
+              <div className="min-w-0 space-y-0.5">
+                <p className="font-semibold text-sm truncate">{storeName || "Nama Toko"}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2">{storeDesc || "Deskripsi toko..."}</p>
+                <p className="text-[11px] text-muted-foreground/70">soyo.lovable.app</p>
+              </div>
+            </div>
+          </div>
+
+          {/* SEO Checklist */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status SEO</p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: "Nama Toko", ok: !!storeName.trim() },
+                { label: "Deskripsi", ok: !!storeDesc.trim() },
+                { label: "Logo", ok: !!logoUrl.trim() },
+                { label: "Sitemap Aktif", ok: true },
+              ].map(item => (
+                <div key={item.label} className="flex items-center gap-1.5 text-sm">
+                  {item.ok ? (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-destructive" />
+                  )}
+                  <span className={item.ok ? "text-foreground" : "text-muted-foreground"}>{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
