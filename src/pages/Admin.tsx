@@ -60,8 +60,8 @@ function GlobalSettingsTab() {
           global_checkout_target: target,
           global_checkout_message: message || null,
           is_homepage_random: isRandom,
-          store_name: storeName || "Toko Cokotq",
-          store_description: storeDesc || "Belanja mudah, harga bersahabat",
+          store_name: storeName || "",
+          store_description: storeDesc || "",
           logo_url: logoUrl || null,
           header_alignment: headerAlign,
         } as any)
@@ -89,7 +89,7 @@ function GlobalSettingsTab() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Nama Toko</Label>
-              <Input value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="Toko Cokotq" />
+              <Input value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="Nama Toko" />
             </div>
             <div className="space-y-2">
               <Label>Deskripsi Toko</Label>

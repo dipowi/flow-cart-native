@@ -18,10 +18,10 @@ function SkeletonCard() {
 }
 
 function DynamicHeader() {
-  const { data: settings } = useStoreSettings();
+  const { data: settings, isLoading } = useStoreSettings();
 
-  const name = settings?.storeName ?? "Toko Cokotq";
-  const desc = settings?.storeDescription ?? "Belanja mudah, harga bersahabat";
+  const name = settings?.storeName ?? "";
+  const desc = settings?.storeDescription ?? "";
   const logoUrl = settings?.logoUrl;
   const align = settings?.headerAlignment ?? "left";
 
@@ -37,16 +37,30 @@ function DynamicHeader() {
     right: "flex flex-col items-end text-right",
   };
 
+  const showSkeleton = isLoading && !name;
+
   return (
     <header className="mb-6 px-4 py-4 -mx-4 border-b border-border">
       <div className={alignClasses[align]}>
-        {logoUrl && (
-          <img src={logoUrl} alt={name} className="h-10 w-auto object-contain flex-shrink-0" />
+        {showSkeleton ? (
+          <div className="flex flex-row items-center gap-3 md:gap-4 w-full">
+            <div className="h-10 w-10 rounded-md animate-pulse bg-muted flex-shrink-0" />
+            <div className="flex flex-col gap-2">
+              <div className="h-6 w-32 md:w-48 animate-pulse bg-muted rounded-md" />
+              <div className="h-4 w-48 md:w-64 animate-pulse bg-muted/50 rounded-md" />
+            </div>
+          </div>
+        ) : (
+          <>
+            {logoUrl && (
+              <img src={logoUrl} alt={name} className="h-10 w-auto object-contain flex-shrink-0" />
+            )}
+            <div className={textAlignClasses[align]}>
+              <h1 className="text-xl font-extrabold text-foreground tracking-tight leading-tight">{name}</h1>
+              <p className="text-sm text-muted-foreground">{desc}</p>
+            </div>
+          </>
         )}
-        <div className={textAlignClasses[align]}>
-          <h1 className="text-xl font-extrabold text-foreground tracking-tight leading-tight">{name}</h1>
-          <p className="text-sm text-muted-foreground">{desc}</p>
-        </div>
       </div>
     </header>
   );
@@ -68,8 +82,8 @@ export default function Index() {
   }, [loadMore, hasMore]);
 
   const { data: settings } = useStoreSettings();
-  const storeName = settings?.storeName ?? "SOYO STORE";
-  const storeDesc = settings?.storeDescription ?? "Belanja mudah, harga bersahabat";
+  const storeName = settings?.storeName ?? "";
+  const storeDesc = settings?.storeDescription ?? "";
   const logoUrl = settings?.logoUrl;
 
   const jsonLd = {
