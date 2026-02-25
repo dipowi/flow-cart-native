@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Package, Plus, Pencil, Trash2, LogOut, X, GripVertical, Pin, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+import { Settings, Package, Plus, Pencil, Trash2, LogOut, X, GripVertical, Pin, AlignLeft, AlignCenter, AlignRight, Eye, EyeOff, PackageX } from "lucide-react";
 import { toast } from "sonner";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
 
@@ -493,13 +493,35 @@ function ProductsTab() {
 
   const reorderMutation = useMutation({
     mutationFn: async (updates: { id: string; order_index: number }[]) => {
-      // Batch update order indices
       for (const u of updates) {
         const { error } = await supabase.from("products").update({ order_index: u.order_index }).eq("id", u.id);
         if (error) throw error;
       }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: async ({ id, field, value }: { id: string; field: "is_active" | "is_sold_out"; value: boolean }) => {
+      const { error } = await supabase.from("products").update({ [field]: value } as any).eq("id", id);
+      if (error) throw error;
+    },
+    onMutate: async ({ id, field, value }) => {
+      await queryClient.cancelQueries({ queryKey: ["admin-products"] });
+      const prev = queryClient.getQueryData<any[]>(["admin-products"]);
+      queryClient.setQueryData(["admin-products"], (old: any[]) =>
+        old?.map(p => p.id === id ? { ...p, [field]: value } : p)
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(["admin-products"], ctx.prev);
+      toast.error("Gagal memperbarui status");
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -544,7 +566,8 @@ function ProductsTab() {
                   <TableHead className="w-12">#</TableHead>
                   <TableHead>Produk</TableHead>
                   <TableHead className="hidden sm:table-cell">Harga</TableHead>
-                  <TableHead className="hidden md:table-cell">Status</TableHead>
+                  <TableHead className="hidden md:table-cell w-24">Tampilkan</TableHead>
+                  <TableHead className="hidden md:table-cell w-24">Stok Habis</TableHead>
                   <TableHead className="w-28 text-right">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
@@ -557,7 +580,7 @@ function ProductsTab() {
                           <TableRow
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            className={`${snapshot.isDragging ? "bg-accent shadow-lg" : ""} ${p.is_pinned ? "bg-accent/40" : ""}`}
+                            className={`${snapshot.isDragging ? "bg-accent shadow-lg" : ""} ${p.is_pinned ? "bg-accent/40" : ""} ${!p.is_active ? "opacity-50" : ""}`}
                           >
                             <TableCell>
                               <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1">
@@ -577,8 +600,25 @@ function ProductsTab() {
                               </div>
                             </TableCell>
                             <TableCell className="hidden sm:table-cell text-sm">{p.price}</TableCell>
-                            <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
-                              {p.checkout_type ? `${p.checkout_type}` : "Global"}
+                            <TableCell className="hidden md:table-cell">
+                              <div className="flex items-center gap-1.5">
+                                {p.is_active ? <Eye className="h-3.5 w-3.5 text-emerald-500" /> : <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />}
+                                <Switch
+                                  checked={p.is_active}
+                                  onCheckedChange={v => toggleMutation.mutate({ id: p.id, field: "is_active", value: v })}
+                                  className="scale-75"
+                                />
+                              </div>
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              <div className="flex items-center gap-1.5">
+                                <PackageX className={`h-3.5 w-3.5 ${p.is_sold_out ? "text-destructive" : "text-muted-foreground"}`} />
+                                <Switch
+                                  checked={p.is_sold_out}
+                                  onCheckedChange={v => toggleMutation.mutate({ id: p.id, field: "is_sold_out", value: v })}
+                                  className="scale-75"
+                                />
+                              </div>
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-0.5">

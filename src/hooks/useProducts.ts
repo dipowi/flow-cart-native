@@ -27,6 +27,8 @@ function mapRow(row: any): Product {
     tags: row.tags ?? [],
     isPinned: row.is_pinned ?? false,
     orderIndex: row.order_index ?? 0,
+    isActive: row.is_active ?? true,
+    isSoldOut: row.is_sold_out ?? false,
     checkout: hasCustomCheckout
       ? { type: row.checkout_type, target: row.checkout_target, message: row.checkout_message }
       : null,
@@ -54,6 +56,7 @@ export function useProductFeed() {
       const { data, error } = await supabase
         .from("products")
         .select("*")
+        .eq("is_active", true)
         .order("is_pinned", { ascending: false })
         .order("order_index", { ascending: true })
         .limit(CHUNK);
@@ -67,6 +70,7 @@ export function useProductFeed() {
         supabase
           .from("products")
           .select("*")
+          .eq("is_active", true)
           .order("is_pinned", { ascending: false })
           .order("order_index", { ascending: true })
           .range(CHUNK, 1000),
