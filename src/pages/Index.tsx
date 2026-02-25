@@ -2,6 +2,7 @@ import { useProductFeed } from "@/hooks/useProducts";
 import { useStoreSettings } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
 import { useEffect, useRef } from "react";
+import { Helmet } from "react-helmet-async";
 
 function SkeletonCard() {
   return (
@@ -66,8 +67,36 @@ export default function Index() {
     return () => observer.disconnect();
   }, [loadMore, hasMore]);
 
+  const { data: settings } = useStoreSettings();
+  const storeName = settings?.storeName ?? "SOYO STORE";
+  const storeDesc = settings?.storeDescription ?? "Belanja mudah, harga bersahabat";
+  const logoUrl = settings?.logoUrl;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: storeName,
+    description: storeDesc,
+    url: window.location.origin,
+    ...(logoUrl ? { image: logoUrl } : {}),
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{storeName} — {storeDesc}</title>
+        <meta name="description" content={storeDesc} />
+        <meta property="og:title" content={storeName} />
+        <meta property="og:description" content={storeDesc} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        {logoUrl && <meta property="og:image" content={logoUrl} />}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={storeName} />
+        <meta name="twitter:description" content={storeDesc} />
+        {logoUrl && <meta name="twitter:image" content={logoUrl} />}
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
       <div className="mx-auto max-w-[730px] px-4 pb-12">
         <DynamicHeader />
 

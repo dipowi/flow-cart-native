@@ -6,6 +6,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import ProductCard from "@/components/ProductCard";
 import ImageCarousel from "@/components/ImageCarousel";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { Helmet } from "react-helmet-async";
 
 function CheckoutIcon({ type }: { type: string }) {
   switch (type) {
@@ -93,8 +94,50 @@ export default function ProductDetail() {
   const checkoutUrl = getCheckoutUrl(product, storeSettings);
   const checkoutType = product.checkout?.type ?? storeSettings?.globalCheckoutType ?? "link";
 
+  const storeName = storeSettings?.storeName ?? "SOYO STORE";
+  const metaDesc = product.description?.substring(0, 160) ?? "";
+  const ogImage = product.images?.[0] ?? "";
+  const canonicalUrl = `${window.location.origin}/p/${product.slug}`;
+
+  const priceNum = product.price?.replace(/[^\d]/g, "") ?? "";
+  const availability = isSoldOut
+    ? "https://schema.org/OutOfStock"
+    : "https://schema.org/InStock";
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    image: product.images,
+    description: product.description,
+    offers: {
+      "@type": "Offer",
+      price: priceNum,
+      priceCurrency: "IDR",
+      availability,
+      url: canonicalUrl,
+    },
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{product.title} | {storeName}</title>
+        <meta name="description" content={metaDesc} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={product.title} />
+        <meta property="og:description" content={metaDesc} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="product:price:amount" content={priceNum} />
+        <meta property="product:price:currency" content="IDR" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={product.title} />
+        <meta name="twitter:description" content={metaDesc} />
+        <meta name="twitter:image" content={ogImage} />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
       <div className="mx-auto max-w-[960px] px-4 pb-28 md:pb-32">
         {/* Split-Pane: 1 col mobile, 2 col desktop */}
         <article className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 items-start">
