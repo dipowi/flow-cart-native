@@ -12,6 +12,7 @@ interface ImageCarouselProps {
 export default function ImageCarousel({ images, alt, className = "", priority = false }: ImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -25,6 +26,20 @@ export default function ImageCarousel({ images, alt, className = "", priority = 
     if (!el) return;
     el.scrollTo({ left: el.clientWidth * index, behavior: "smooth" });
   }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    const threshold = 50;
+    if (delta > threshold && activeIndex === images.length - 1) {
+      scrollToSlide(0);
+    } else if (delta < -threshold && activeIndex === 0) {
+      scrollToSlide(images.length - 1);
+    }
+  }, [activeIndex, images.length, scrollToSlide]);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -57,6 +72,8 @@ export default function ImageCarousel({ images, alt, className = "", priority = 
         <div
           ref={scrollRef}
           onScroll={handleScroll}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
         >
