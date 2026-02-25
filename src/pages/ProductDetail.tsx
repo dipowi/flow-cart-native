@@ -94,7 +94,7 @@ export default function ProductDetail() {
   const checkoutUrl = getCheckoutUrl(product, storeSettings);
   const checkoutType = product.checkout?.type ?? storeSettings?.globalCheckoutType ?? "link";
 
-  const storeName = storeSettings?.storeName ?? "SOYO STORE";
+  const storeName = storeSettings?.storeName ?? "";
   const metaDesc = product.description?.substring(0, 160) ?? "";
   const ogImage = product.images?.[0] ?? "";
   const canonicalUrl = `${window.location.origin}/p/${product.slug}`;

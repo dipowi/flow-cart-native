@@ -139,10 +139,28 @@ export function useDiscoveryQueue(productId: string | undefined, tags: string[])
   });
 }
 
+const STORE_SETTINGS_KEY = "store_settings_cache";
+
 export function useStoreSettings() {
   return useQuery({
     queryKey: ["store-settings"],
-    queryFn: fetchStoreSettings,
+    queryFn: async () => {
+      const fresh = await fetchStoreSettings();
+      if (fresh) {
+        try { localStorage.setItem(STORE_SETTINGS_KEY, JSON.stringify(fresh)); } catch {}
+      }
+      return fresh;
+    },
     staleTime: 60_000,
+    initialData: () => {
+      try {
+        const cached = localStorage.getItem(STORE_SETTINGS_KEY);
+        return cached ? JSON.parse(cached) : undefined;
+      } catch { return undefined; }
+    },
+    initialDataUpdatedAt: () => {
+      // Treat cached data as stale so background revalidation fires immediately
+      return 0;
+    },
   });
 }
