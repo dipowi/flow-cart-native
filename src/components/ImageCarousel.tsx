@@ -78,7 +78,7 @@ export default function ImageCarousel({ images, alt, className = "", priority = 
           style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
         >
           {images.map((src, i) => (
-            <div key={i} className="flex-none w-full h-full snap-center">
+            <div key={i} className={`flex-none w-full h-full snap-center ${i === 0 && images.length > 1 ? 'animate-swipe-hint' : ''}`}>
               <OptimizedImage
                 src={src}
                 alt={`${alt} ${i + 1}`}
