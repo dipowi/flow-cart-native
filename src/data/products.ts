@@ -10,6 +10,8 @@ export interface StoreSettings {
   storeDescription: string;
   logoUrl: string | null;
   headerAlignment: "left" | "center" | "right";
+  seoTitle: string | null;
+  seoDescription: string | null;
 }
 
 export interface Product {
@@ -156,6 +158,8 @@ export async function fetchStoreSettings(): Promise<StoreSettings | null> {
     storeDescription: (data as any).store_description ?? "",
     logoUrl: (data as any).logo_url ?? null,
     headerAlignment: ((data as any).header_alignment ?? "left") as StoreSettings["headerAlignment"],
+    seoTitle: (data as any).seo_title ?? null,
+    seoDescription: (data as any).seo_description ?? null,
   };
 }
 

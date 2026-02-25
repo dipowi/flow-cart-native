@@ -86,11 +86,15 @@ export default function Index() {
   const storeDesc = settings?.storeDescription ?? "";
   const logoUrl = settings?.logoUrl;
 
+  // Decoupled SEO: prioritize dedicated SEO fields, fallback to visual fields
+  const seoTitle = settings?.seoTitle || storeName;
+  const seoDesc = settings?.seoDescription || storeDesc;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: storeName,
-    description: storeDesc,
+    name: seoTitle,
+    description: seoDesc,
     url: window.location.origin,
     ...(logoUrl ? { image: logoUrl } : {}),
   };
@@ -98,16 +102,16 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>{storeName} — {storeDesc}</title>
-        <meta name="description" content={storeDesc} />
-        <meta property="og:title" content={storeName} />
-        <meta property="og:description" content={storeDesc} />
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDesc} />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDesc} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         {logoUrl && <meta property="og:image" content={logoUrl} />}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={storeName} />
-        <meta name="twitter:description" content={storeDesc} />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDesc} />
         {logoUrl && <meta name="twitter:image" content={logoUrl} />}
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>

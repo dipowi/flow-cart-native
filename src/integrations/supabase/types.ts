@@ -101,6 +101,8 @@ export type Database = {
           id: string
           is_homepage_random: boolean
           logo_url: string | null
+          seo_description: string | null
+          seo_title: string | null
           store_description: string
           store_name: string
           updated_at: string
@@ -113,6 +115,8 @@ export type Database = {
           id?: string
           is_homepage_random?: boolean
           logo_url?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           store_description?: string
           store_name?: string
           updated_at?: string
@@ -125,6 +129,8 @@ export type Database = {
           id?: string
           is_homepage_random?: boolean
           logo_url?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           store_description?: string
           store_name?: string
           updated_at?: string

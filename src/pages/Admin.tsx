@@ -36,6 +36,8 @@ function GlobalSettingsTab() {
   const [storeDesc, setStoreDesc] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [headerAlign, setHeaderAlign] = useState<string>("left");
+  const [seoTitle, setSeoTitle] = useState("");
+  const [seoDesc, setSeoDesc] = useState("");
 
   useEffect(() => {
     if (settings) {
@@ -47,6 +49,8 @@ function GlobalSettingsTab() {
       setStoreDesc(settings.storeDescription ?? "");
       setLogoUrl(settings.logoUrl ?? "");
       setHeaderAlign(settings.headerAlignment ?? "left");
+      setSeoTitle(settings.seoTitle ?? "");
+      setSeoDesc(settings.seoDescription ?? "");
     }
   }, [settings]);
 
@@ -64,6 +68,8 @@ function GlobalSettingsTab() {
           store_description: storeDesc || "",
           logo_url: logoUrl || null,
           header_alignment: headerAlign,
+          seo_title: seoTitle || null,
+          seo_description: seoDesc || null,
         } as any)
         .eq("id", settings.id);
       if (error) throw error;
@@ -179,69 +185,99 @@ function GlobalSettingsTab() {
         </CardContent>
       </Card>
 
-      {/* SEO & Social Preview */}
+      {/* SEO Settings — Decoupled from Visual */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <Search className="h-5 w-5" /> Preview SEO & Sosial Media
+            <Search className="h-5 w-5" /> Search Engine Optimization (SEO)
           </CardTitle>
-          <CardDescription>Begini tampilan toko Anda di Google & WhatsApp berdasarkan pengaturan di atas.</CardDescription>
+          <CardDescription>Optimalkan tampilan toko di Google & media sosial. Field ini TERPISAH dari nama/deskripsi yang terlihat di website.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Google Search Preview */}
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Google Search Preview</p>
-            <div className="rounded-lg border border-border p-4 space-y-1 bg-card">
-              <p className="text-lg leading-snug" style={{ color: "#1a0dab" }}>
-                {storeName || "Nama Toko"} — {storeDesc || "Deskripsi toko"}
-              </p>
-              <p className="text-sm" style={{ color: "#006621" }}>soyo.lovable.app</p>
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {storeDesc || "Deskripsi toko Anda akan muncul di sini. Isi di kolom Deskripsi Toko di atas."}
-              </p>
+        <CardContent className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-1">
+            <div className="space-y-2">
+              <Label>SEO Title (Meta Title)</Label>
+              <Input value={seoTitle} onChange={e => setSeoTitle(e.target.value)} maxLength={60} placeholder="Contoh: Tokogas | Jual Beli Akun Premium & Top Up Game Termurah" />
+              <div className="flex justify-between">
+                <p className="text-xs text-muted-foreground">Maksimal 60 karakter. Gunakan kata kunci pencarian.</p>
+                <p className="text-xs text-muted-foreground">{seoTitle.length}/60</p>
+              </div>
             </div>
-          </div>
-
-          {/* WhatsApp Preview */}
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <MessageCircle className="h-3.5 w-3.5" /> WhatsApp / Social Preview
-            </p>
-            <div className="rounded-lg border border-border bg-muted p-3 flex gap-3 items-start max-w-sm">
-              {logoUrl ? (
-                <img src={logoUrl} alt="Logo" className="h-16 w-16 rounded-md object-cover shrink-0 bg-background" />
-              ) : (
-                <div className="h-16 w-16 rounded-md bg-background flex items-center justify-center shrink-0">
-                  <span className="text-[10px] text-muted-foreground font-medium">LOGO</span>
-                </div>
-              )}
-              <div className="min-w-0 space-y-0.5">
-                <p className="font-semibold text-sm truncate">{storeName || "Nama Toko"}</p>
-                <p className="text-xs text-muted-foreground line-clamp-2">{storeDesc || "Deskripsi toko..."}</p>
-                <p className="text-[11px] text-muted-foreground/70">soyo.lovable.app</p>
+            <div className="space-y-2">
+              <Label>SEO Description (Meta Description)</Label>
+              <Textarea value={seoDesc} onChange={e => setSeoDesc(e.target.value)} maxLength={160} rows={3} placeholder="Contoh: Jual beli akun premium Netflix, Spotify, Disney+. Top up game Mobile Legends, Free Fire. Harga termurah, proses cepat!" />
+              <div className="flex justify-between">
+                <p className="text-xs text-muted-foreground">Maksimal 160 karakter. Kalimat promosi untuk Google.</p>
+                <p className="text-xs text-muted-foreground">{seoDesc.length}/160</p>
               </div>
             </div>
           </div>
+          {!seoTitle && !seoDesc && (
+            <p className="text-xs text-amber-500">⚠️ Belum diisi — SEO akan menggunakan Nama Toko & Deskripsi sebagai fallback.</p>
+          )}
+          <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+            {mutation.isPending ? "Menyimpan..." : "Simpan Pengaturan"}
+          </Button>
 
-          {/* SEO Checklist */}
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status SEO</p>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: "Nama Toko", ok: !!storeName.trim() },
-                { label: "Deskripsi", ok: !!storeDesc.trim() },
-                { label: "Logo", ok: !!logoUrl.trim() },
-                { label: "Sitemap Aktif", ok: true },
-              ].map(item => (
-                <div key={item.label} className="flex items-center gap-1.5 text-sm">
-                  {item.ok ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <XCircle className="h-4 w-4 text-destructive" />
-                  )}
-                  <span className={item.ok ? "text-foreground" : "text-muted-foreground"}>{item.label}</span>
+          {/* Live Previews */}
+          <div className="border-t border-border pt-5 mt-2 space-y-5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Preview SEO & Sosial Media</p>
+
+            {/* Google Search Preview */}
+            <div className="space-y-1.5">
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Google Search</p>
+              <div className="rounded-lg border border-border p-4 space-y-1 bg-card">
+                <p className="text-lg leading-snug" style={{ color: "#1a0dab" }}>
+                  {seoTitle || storeName || "Nama Toko"}
+                </p>
+                <p className="text-sm" style={{ color: "#006621" }}>soyo.lovable.app</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {seoDesc || storeDesc || "Deskripsi toko Anda akan muncul di sini."}
+                </p>
+              </div>
+            </div>
+
+            {/* WhatsApp Preview */}
+            <div className="space-y-1.5">
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <MessageCircle className="h-3.5 w-3.5" /> WhatsApp / Social
+              </p>
+              <div className="rounded-lg border border-border bg-muted p-3 flex gap-3 items-start max-w-sm">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo" className="h-16 w-16 rounded-md object-cover shrink-0 bg-background" />
+                ) : (
+                  <div className="h-16 w-16 rounded-md bg-background flex items-center justify-center shrink-0">
+                    <span className="text-[10px] text-muted-foreground font-medium">LOGO</span>
+                  </div>
+                )}
+                <div className="min-w-0 space-y-0.5">
+                  <p className="font-semibold text-sm truncate">{seoTitle || storeName || "Nama Toko"}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{seoDesc || storeDesc || "Deskripsi toko..."}</p>
+                  <p className="text-[11px] text-muted-foreground/70">soyo.lovable.app</p>
                 </div>
-              ))}
+              </div>
+            </div>
+
+            {/* SEO Checklist */}
+            <div className="space-y-1.5">
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Status SEO</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "SEO Title", ok: !!seoTitle.trim() },
+                  { label: "SEO Description", ok: !!seoDesc.trim() },
+                  { label: "Logo", ok: !!logoUrl.trim() },
+                  { label: "Sitemap Aktif", ok: true },
+                ].map(item => (
+                  <div key={item.label} className="flex items-center gap-1.5 text-sm">
+                    {item.ok ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-destructive" />
+                    )}
+                    <span className={item.ok ? "text-foreground" : "text-muted-foreground"}>{item.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </CardContent>
