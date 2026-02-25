@@ -26,4 +26,4 @@ Allow: /
 User-agent: ChatGPT-User
 Allow: /
 
-Sitemap: https://soyo.lovable.app/sitemap.xml
+Sitemap: https://ticmpwjejjfcngkoowjg.supabase.co/functions/v1/sitemap
