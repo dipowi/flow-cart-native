@@ -75,3 +75,22 @@
     scrollbar-width: none;
   }
 }
+
+@keyframes mobile-swipe-hint {
+  0% { transform: translateX(0); }
+  15% { transform: translateX(-12%); }
+  30% { transform: translateX(0); }
+  100% { transform: translateX(0); }
+}
+
+.animate-swipe-hint {
+  animation: mobile-swipe-hint 2.5s cubic-bezier(0.25, 1, 0.5, 1) 1s 1 normal both;
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .animate-swipe-hint {
+    animation: none;
+    will-change: auto;
+  }
+}
