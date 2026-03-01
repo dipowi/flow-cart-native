@@ -1,5 +1,6 @@
 
 
+
 ## Panduan Setup untuk Orang yang Remix Project Ini
 
 Berikut adalah daftar lengkap semua yang perlu dikonfigurasi agar project ini berjalan di Lovable Cloud akun baru.
@@ -60,16 +61,9 @@ Setelah login di `/pdidin`, atur:
 
 ---
 
-### Langkah 4: Update URL di Edge Functions (Opsional tapi Penting)
+### Langkah 4: Edge Functions (Otomatis — Tidak Perlu Diubah)
 
-Dua edge function memiliki URL yang di-hardcode ke `https://soyo.lovable.app`:
-
-- **`supabase/functions/ogcard/index.ts`** — baris 9: `const BASE_URL = "https://soyo.lovable.app"`
-- **`supabase/functions/sitemap/index.ts`** — baris 9: `const BASE_URL = "https://soyo.lovable.app"`
-
-Ganti dengan URL published milik akun baru, misalnya `https://namatoko.lovable.app`.
-
-Juga di `ogcard/index.ts` baris 10: `const STORE_NAME = "SOYO STORE"` — ganti sesuai nama toko baru.
+Edge functions `ogcard` dan `sitemap` sekarang membaca `BASE_URL` dan `STORE_NAME` secara **dinamis** dari tabel `store_settings` dan request origin. Tidak ada URL yang di-hardcode. Cukup isi nama toko di dashboard admin dan semuanya otomatis menyesuaikan.
 
 ---
 
@@ -86,7 +80,7 @@ File `public/_redirects` sudah dikonfigurasi untuk SPA routing di Netlify/Lovabl
 | 1 | Database tables, RLS, functions | Ya (migrasi) |
 | 2 | Buat user + assign role admin | **Manual (SQL)** |
 | 3 | Isi pengaturan toko di `/pdidin` | **Manual (UI)** |
-| 4 | Ganti BASE_URL di edge functions | **Manual (kode)** |
+| 4 | Edge functions (ogcard, sitemap) | Ya (dinamis) |
 | 5 | SPA redirect | Ya (sudah ada) |
 
 ---
@@ -97,4 +91,3 @@ File `public/_redirects` sudah dikonfigurasi untuk SPA routing di Netlify/Lovabl
 - Login admin menggunakan email + password via authentication system
 - Semua secrets backend (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, dll) otomatis tersedia di Lovable Cloud
 - Edge function `daily-activity` adalah cron maintenance untuk menjaga database tetap aktif
-

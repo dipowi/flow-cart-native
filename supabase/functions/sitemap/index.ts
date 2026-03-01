@@ -6,8 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://soyo.lovable.app";
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -18,6 +16,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!
     );
+
+    // Derive BASE_URL dynamically from the request
+    const url = new URL(req.url);
+    const BASE_URL = url.origin.includes("supabase.co")
+      ? `https://${Deno.env.get("SUPABASE_URL")?.replace("https://", "").replace(".supabase.co", "")}.lovable.app`
+      : url.origin;
 
     const { data: products, error } = await supabase
       .from("products")
