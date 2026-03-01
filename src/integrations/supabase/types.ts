@@ -31,10 +31,12 @@ export type Database = {
       }
       products: {
         Row: {
+          affiliate_url: string | null
           checkout_message: string | null
           checkout_target: string | null
           checkout_type: string | null
           created_at: string
+          cta_text: string | null
           description: string
           discount_percentage: string | null
           id: string
@@ -51,10 +53,12 @@ export type Database = {
           title: string
         }
         Insert: {
+          affiliate_url?: string | null
           checkout_message?: string | null
           checkout_target?: string | null
           checkout_type?: string | null
           created_at?: string
+          cta_text?: string | null
           description: string
           discount_percentage?: string | null
           id?: string
@@ -71,10 +75,12 @@ export type Database = {
           title: string
         }
         Update: {
+          affiliate_url?: string | null
           checkout_message?: string | null
           checkout_target?: string | null
           checkout_type?: string | null
           created_at?: string
+          cta_text?: string | null
           description?: string
           discount_percentage?: string | null
           id?: string

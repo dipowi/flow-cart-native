@@ -29,6 +29,8 @@ function mapRow(row: any): Product {
     orderIndex: row.order_index ?? 0,
     isActive: row.is_active ?? true,
     isSoldOut: row.is_sold_out ?? false,
+    ctaText: row.cta_text ?? "Beli Sekarang",
+    affiliateUrl: row.affiliate_url ?? null,
     checkout: hasCustomCheckout
       ? { type: row.checkout_type, target: row.checkout_target, message: row.checkout_message }
       : null,
