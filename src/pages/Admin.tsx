@@ -574,24 +574,82 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
   );
 }
 
-// ─── Products Management Tab with Drag & Drop ────────────────────────────────
+// ─── Skeleton Table ──────────────────────────────────────────────────────────
+function SkeletonTable() {
+  return (
+    <Card>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-10" />
+            <TableHead className="w-12">#</TableHead>
+            <TableHead>Produk</TableHead>
+            <TableHead className="hidden sm:table-cell">Harga</TableHead>
+            <TableHead className="hidden md:table-cell w-24">Tampilkan</TableHead>
+            <TableHead className="hidden md:table-cell w-24">Stok Habis</TableHead>
+            <TableHead className="w-28 text-right">Aksi</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {[...Array(5)].map((_, i) => (
+            <TableRow key={i}>
+              <TableCell><div className="h-4 w-4 rounded animate-pulse bg-muted" /></TableCell>
+              <TableCell><div className="h-4 w-6 rounded animate-pulse bg-muted" /></TableCell>
+              <TableCell>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg animate-pulse bg-muted flex-shrink-0" />
+                  <div className="h-4 w-32 rounded animate-pulse bg-muted" />
+                </div>
+              </TableCell>
+              <TableCell className="hidden sm:table-cell"><div className="h-4 w-20 rounded animate-pulse bg-muted" /></TableCell>
+              <TableCell className="hidden md:table-cell"><div className="h-5 w-10 rounded-full animate-pulse bg-muted" /></TableCell>
+              <TableCell className="hidden md:table-cell"><div className="h-5 w-10 rounded-full animate-pulse bg-muted" /></TableCell>
+              <TableCell><div className="h-4 w-20 rounded animate-pulse bg-muted ml-auto" /></TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Card>
+  );
+}
+
+// ─── Products Management Tab with Drag & Drop + Pagination ───────────────────
+const ITEMS_PER_PAGE = 10;
+
 function ProductsTab() {
   const queryClient = useQueryClient();
   const [editProduct, setEditProduct] = useState<any>(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [page, setPage] = useState(0);
+
+  const { data: totalCount = 0 } = useQuery({
+    queryKey: ["admin-products-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("products")
+        .select("*", { count: "exact", head: true });
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
 
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ["admin-products"],
+    queryKey: ["admin-products", page],
     queryFn: async () => {
+      const from = page * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
       const { data, error } = await supabase
         .from("products")
         .select("*")
         .order("is_pinned", { ascending: false })
-        .order("order_index", { ascending: true });
+        .order("order_index", { ascending: true })
+        .range(from, to);
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -600,6 +658,7 @@ function ProductsTab() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products-count"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["products-count"] });
       toast.success("Produk berhasil dihapus");
@@ -637,15 +696,15 @@ function ProductsTab() {
       if (error) throw error;
     },
     onMutate: async ({ id, field, value }) => {
-      await queryClient.cancelQueries({ queryKey: ["admin-products"] });
-      const prev = queryClient.getQueryData<any[]>(["admin-products"]);
-      queryClient.setQueryData(["admin-products"], (old: any[]) =>
+      await queryClient.cancelQueries({ queryKey: ["admin-products", page] });
+      const prev = queryClient.getQueryData<any[]>(["admin-products", page]);
+      queryClient.setQueryData(["admin-products", page], (old: any[]) =>
         old?.map(p => p.id === id ? { ...p, [field]: value } : p)
       );
       return { prev };
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(["admin-products"], ctx.prev);
+      if (ctx?.prev) queryClient.setQueryData(["admin-products", page], ctx.prev);
       toast.error("Gagal memperbarui status");
     },
     onSettled: () => {
@@ -659,17 +718,15 @@ function ProductsTab() {
     const items = [...products];
     const [moved] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, moved);
-    // Update order_index for all items
-    const updates = items.map((item, idx) => ({ id: item.id, order_index: idx }));
-    // Optimistic update
-    queryClient.setQueryData(["admin-products"], items.map((item, idx) => ({ ...item, order_index: idx })));
+    const updates = items.map((item, idx) => ({ id: item.id, order_index: page * ITEMS_PER_PAGE + idx }));
+    queryClient.setQueryData(["admin-products", page], items.map((item, idx) => ({ ...item, order_index: page * ITEMS_PER_PAGE + idx })));
     reorderMutation.mutate(updates);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-foreground">{products.length} Produk</h3>
+        <h3 className="text-lg font-semibold text-foreground">{totalCount} Produk</h3>
         <Dialog open={showAdd} onOpenChange={setShowAdd}>
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Tambah Produk</Button>
@@ -682,7 +739,7 @@ function ProductsTab() {
       </div>
 
       {isLoading ? (
-        <div className="text-sm text-muted-foreground p-4">Memuat...</div>
+        <SkeletonTable />
       ) : (
         <Card>
           <DragDropContext onDragEnd={handleDragEnd}>
@@ -707,7 +764,8 @@ function ProductsTab() {
                           <TableRow
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            className={`${snapshot.isDragging ? "bg-accent shadow-lg" : ""} ${p.is_pinned ? "bg-accent/40" : ""} ${!p.is_active ? "opacity-50" : ""}`}
+                            className={`animate-fade-in ${snapshot.isDragging ? "bg-accent shadow-lg" : ""} ${p.is_pinned ? "bg-accent/40" : ""} ${!p.is_active ? "opacity-50" : ""}`}
+                            style={{ ...provided.draggableProps.style, animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
                           >
                             <TableCell>
                               <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing p-1">
@@ -718,7 +776,7 @@ function ProductsTab() {
                             <TableCell>
                               <div className="flex items-center gap-3">
                                 {p.image_urls?.[0] && (
-                                  <img src={p.image_urls[0]} alt="" className="h-10 w-10 rounded-lg object-cover bg-muted flex-shrink-0" />
+                                  <img src={p.image_urls[0]} alt="" loading="lazy" decoding="async" className="h-10 w-10 rounded-lg object-cover bg-muted flex-shrink-0" />
                                 )}
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium text-sm line-clamp-1">{p.title}</span>
@@ -729,7 +787,7 @@ function ProductsTab() {
                             <TableCell className="hidden sm:table-cell text-sm">{p.price}</TableCell>
                             <TableCell className="hidden md:table-cell">
                               <div className="flex items-center gap-1.5">
-                                {p.is_active ? <Eye className="h-3.5 w-3.5 text-emerald-500" /> : <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />}
+                                {p.is_active ? <Eye className="h-3.5 w-3.5 text-accent-foreground" /> : <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />}
                                 <Switch
                                   checked={p.is_active}
                                   onCheckedChange={v => toggleMutation.mutate({ id: p.id, field: "is_active", value: v })}
@@ -785,6 +843,33 @@ function ProductsTab() {
             </Table>
           </DragDropContext>
         </Card>
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-2">
+          <p className="text-sm text-muted-foreground">
+            Halaman {page + 1} dari {totalPages}
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 0}
+              onClick={() => setPage(p => p - 1)}
+            >
+              Sebelumnya
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages - 1}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Selanjutnya
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );
