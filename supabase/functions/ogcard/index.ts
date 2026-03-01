@@ -6,9 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const BASE_URL = "https://soyo.lovable.app";
-const STORE_NAME = "SOYO STORE";
-
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -28,6 +25,19 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_ANON_KEY")!
   );
+
+  // Fetch store settings dynamically for BASE_URL and STORE_NAME
+  const { data: settings } = await supabase
+    .from("store_settings")
+    .select("store_name, seo_title")
+    .limit(1)
+    .maybeSingle();
+
+  const STORE_NAME = settings?.store_name || "My Store";
+  // Derive BASE_URL from the request origin or fallback
+  const BASE_URL = url.origin.includes("supabase.co")
+    ? `https://${Deno.env.get("SUPABASE_URL")?.replace("https://", "").replace(".supabase.co", "")}.lovable.app`
+    : url.origin;
 
   const { data: product, error } = await supabase
     .from("products")
