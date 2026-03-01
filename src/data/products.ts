@@ -28,6 +28,8 @@ export interface Product {
   orderIndex: number;
   isActive: boolean;
   isSoldOut: boolean;
+  ctaText: string;
+  affiliateUrl: string | null;
   checkout: {
     type: "whatsapp" | "telegram" | "link";
     target: string;
@@ -52,6 +54,8 @@ function mapRow(row: any): Product {
     orderIndex: row.order_index ?? 0,
     isActive: row.is_active ?? true,
     isSoldOut: row.is_sold_out ?? false,
+    ctaText: row.cta_text ?? "Beli Sekarang",
+    affiliateUrl: row.affiliate_url ?? null,
     checkout: hasCustomCheckout
       ? {
           type: row.checkout_type as "whatsapp" | "telegram" | "link",
@@ -165,6 +169,9 @@ export async function fetchStoreSettings(): Promise<StoreSettings | null> {
 
 /** Resolve checkout URL using product-specific or global settings */
 export function getCheckoutUrl(product: Product, globalSettings?: StoreSettings | null): string {
+  // Affiliate URL takes priority
+  if (product.affiliateUrl) return product.affiliateUrl;
+
   const checkout = product.checkout ?? (globalSettings ? {
     type: globalSettings.globalCheckoutType,
     target: globalSettings.globalCheckoutTarget,

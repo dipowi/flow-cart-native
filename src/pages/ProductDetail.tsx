@@ -92,7 +92,9 @@ export default function ProductDetail() {
 
   const isSoldOut = product.isSoldOut;
   const checkoutUrl = getCheckoutUrl(product, storeSettings);
-  const checkoutType = product.checkout?.type ?? storeSettings?.globalCheckoutType ?? "link";
+  const isAffiliate = !!product.affiliateUrl;
+  const ctaText = product.ctaText || "Beli Sekarang";
+  const checkoutType = isAffiliate ? "link" : (product.checkout?.type ?? storeSettings?.globalCheckoutType ?? "link");
 
   const storeName = storeSettings?.storeName ?? "";
   const metaDesc = product.description?.substring(0, 160) ?? "";
@@ -195,7 +197,8 @@ export default function ProductDetail() {
                     onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 10px 25px -5px hsla(25, 95%, 53%, 0.25)'; }}
                   >
                     <CheckoutIcon type={checkoutType} />
-                    Beli Sekarang
+                    {ctaText}
+                    {isAffiliate && <ExternalLink className="h-4 w-4 ml-1" />}
                   </a>
                   <div className="flex items-center justify-center gap-3 mt-4 w-full text-[13px] font-medium text-muted-foreground">
                     <div className="flex items-center gap-1.5">
@@ -290,7 +293,8 @@ export default function ProductDetail() {
               }}
             >
               <CheckoutIcon type={checkoutType} />
-              Beli Sekarang
+              {ctaText}
+              {isAffiliate && <ExternalLink className="h-4 w-4 ml-1" />}
             </a>
           </div>
         </div>

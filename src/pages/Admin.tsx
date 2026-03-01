@@ -302,6 +302,8 @@ interface ProductFormData {
   checkout_target: string;
   checkout_message: string;
   order_index: number;
+  cta_text: string;
+  affiliate_url: string;
 }
 
 function generateSlug(title: string): string {
@@ -318,6 +320,7 @@ const emptyForm: ProductFormData = {
   image_urls: [""], description: "", tags: "",
   is_pinned: false, useCustomCheckout: false, checkout_type: "whatsapp",
   checkout_target: "", checkout_message: "", order_index: 0,
+  cta_text: "Beli Sekarang", affiliate_url: "",
 };
 
 /** Parse "Rp 100.000" or "100000" → number */
@@ -353,6 +356,8 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
       checkout_target: product.checkout_target ?? "",
       checkout_message: product.checkout_message ?? "",
       order_index: product.order_index ?? 0,
+      cta_text: product.cta_text ?? "Beli Sekarang",
+      affiliate_url: product.affiliate_url ?? "",
     };
   });
 
@@ -416,6 +421,8 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
         checkout_type: form.useCustomCheckout ? form.checkout_type : null,
         checkout_target: form.useCustomCheckout ? form.checkout_target : null,
         checkout_message: form.useCustomCheckout ? (form.checkout_message || null) : null,
+        cta_text: form.cta_text || "Beli Sekarang",
+        affiliate_url: form.affiliate_url || null,
       };
 
       if (isEdit) {
@@ -507,6 +514,21 @@ function ProductFormDialog({ product, onClose }: { product?: any; onClose: () =>
               <p className="text-xs text-muted-foreground">Tampilkan selalu di bagian atas</p>
             </div>
             <Switch checked={form.is_pinned} onCheckedChange={v => set("is_pinned", v)} />
+          </div>
+
+          {/* Affiliate & CTA Section */}
+          <div className="border-t border-border pt-4 space-y-3">
+            <p className="text-sm font-semibold text-foreground">🔗 Pengaturan Tombol & Afiliasi</p>
+            <div className="space-y-2">
+              <Label className="text-xs">Teks Tombol (CTA Text)</Label>
+              <Input value={form.cta_text} onChange={e => set("cta_text", e.target.value)} placeholder="Beli Sekarang" />
+              <p className="text-xs text-muted-foreground">Contoh: "Cek Promo Shopee", "Lihat Harga Diskon", "Beli di Tokopedia"</p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Link Eksternal / Afiliasi</Label>
+              <Input value={form.affiliate_url} onChange={e => set("affiliate_url", e.target.value)} placeholder="https://shopee.co.id/..." />
+              <p className="text-xs text-muted-foreground">Kosongkan jika ingin pembeli checkout via WhatsApp. Isi dengan link Shopee/Tokopedia jika ini produk afiliasi.</p>
+            </div>
           </div>
 
           <div className="border-t border-border pt-4 space-y-3">
