@@ -103,11 +103,12 @@ function GlobalSettingsTab() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label>URL Logo (opsional)</Label>
+            <Label>Gambar Merek Global (Logo, Favicon, &amp; Sosmed)</Label>
             <Input value={logoUrl} onChange={e => setLogoUrl(e.target.value)} placeholder="https://..." />
+            <p className="text-xs text-muted-foreground">Upload SATU gambar PNG transparan berkualitas tinggi. Gambar ini akan otomatis digunakan untuk Logo Header, Ikon Tab Browser (Favicon), dan gambar saat Homepage dibagikan ke Medsos. (Disarankan rasio persegi atau landscape, min. 512x512px).</p>
             {logoUrl && (
               <div className="mt-2">
-                <img src={logoUrl} alt="Preview" className="h-10 w-10 rounded-xl object-cover bg-muted" />
+                <img src={logoUrl} alt="Preview" className="h-10 w-10 rounded-xl object-contain bg-muted" />
               </div>
             )}
           </div>
