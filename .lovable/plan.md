@@ -1,32 +1,50 @@
 
 
-## Jawaban: "Include Project History" saat Remix
+## Rencana: Perbaiki Panduan Remix & Greeting Message
 
-**Tidak perlu dicentang.** Pilihan ini opsional.
+### Masalah
+1. `.lovable/plan.md` menyebut "signup via kode" padahal tidak ada form signup di `/pdidin` — hanya login. User baru harus buat akun via chat Lovable (minta AI buatkan) atau lewat backend Auth tab.
+2. Greeting message Lovable setelah remix tidak cukup jelas — perlu panduan yang lebih profesional dan actionable langsung di plan.md.
 
-### Apa bedanya?
+### Yang Akan Dilakukan
 
-| Pilihan | Efek |
-|---------|------|
-| **Tanpa centang** (rekomendasi) | Hanya mendapat kode terbaru + semua migrasi database. Project bersih, ringan. |
-| **Dengan centang** | Mendapat semua riwayat chat & perubahan sebelumnya. File lebih besar, tidak ada manfaat fungsional. |
+**1. Rewrite `.lovable/plan.md` — Panduan profesional & jelas**
 
-### Yang penting untuk diketahui
+Konten baru akan:
+- Menjelaskan bahwa **tidak ada form signup** di aplikasi ini — ini by design
+- Instruksi pembuatan user: **ketik di chat Lovable**: *"Buatkan akun admin dengan email xxx@xxx.com dan password xxx"* — Lovable AI akan menjalankan SQL yang diperlukan
+- Alternatif: buka backend Lovable Cloud → tab Authentication → buat user manual
+- Langkah promosi admin via SQL tetap sama tapi dengan penjelasan lebih jelas
+- Menyertakan langkah konfigurasi toko
+- Format profesional dengan emoji checklist dan bahasa yang ramah untuk pemula
 
-Apapun pilihannya, yang **otomatis ikut** saat remix:
-- Semua file kode (frontend + edge functions)
-- Semua migrasi database di `supabase/migrations/` — tabel, RLS, fungsi SQL akan otomatis dibuat
-- File konfigurasi (`_redirects`, `config.toml`, dll)
+**2. Struktur plan.md baru:**
 
-### Setelah Remix, langkah wajib tetap sama:
+```text
+# 🚀 Selamat Datang! Panduan Setup Setelah Remix
 
-1. **Buat akun** via Authentication di Lovable Cloud
-2. **Promosikan ke admin** via SQL:
-   ```sql
-   INSERT INTO public.user_roles (user_id, role)
-   VALUES ('<UUID_USER>', 'admin');
-   ```
-3. **Login ke `/pdidin`** dan isi pengaturan toko (nama, logo, checkout, SEO)
+## ✅ Yang Sudah Otomatis (Tidak Perlu Disentuh)
+- Database, tabel, RLS policies
+- Edge functions (dinamis)
+- SPA routing
 
-Semua edge function (`ogcard`, `sitemap`, `daily-activity`) sudah dinamis — tidak perlu edit kode apapun.
+## 🔐 Langkah 1: Buat Akun Admin
+- Ketik di chat Lovable: "Buatkan akun admin dengan email [email] dan password [password]"
+- Atau: buka backend → Authentication → Add User
+
+## 👑 Langkah 2: Promosikan ke Admin
+- Ketik di chat Lovable: "Jalankan SQL: INSERT INTO public.user_roles..."
+- Atau: buka backend → SQL Editor → jalankan query
+
+## 🏪 Langkah 3: Login & Konfigurasi Toko
+- Buka /pdidin → login → isi semua pengaturan
+
+## Checklist ringkas (tabel)
+```
+
+### File yang Diubah
+- `.lovable/plan.md` — rewrite total
+
+### Tidak Ada Perubahan Kode
+Tidak ada perubahan di komponen React atau edge functions. Ini murni update dokumentasi.
 
