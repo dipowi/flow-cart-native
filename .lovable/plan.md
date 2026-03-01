@@ -1,50 +1,79 @@
-
-
-## Rencana: Perbaiki Panduan Remix & Greeting Message
-
-### Masalah
-1. `.lovable/plan.md` menyebut "signup via kode" padahal tidak ada form signup di `/pdidin` — hanya login. User baru harus buat akun via chat Lovable (minta AI buatkan) atau lewat backend Auth tab.
-2. Greeting message Lovable setelah remix tidak cukup jelas — perlu panduan yang lebih profesional dan actionable langsung di plan.md.
-
-### Yang Akan Dilakukan
-
-**1. Rewrite `.lovable/plan.md` — Panduan profesional & jelas**
-
-Konten baru akan:
-- Menjelaskan bahwa **tidak ada form signup** di aplikasi ini — ini by design
-- Instruksi pembuatan user: **ketik di chat Lovable**: *"Buatkan akun admin dengan email xxx@xxx.com dan password xxx"* — Lovable AI akan menjalankan SQL yang diperlukan
-- Alternatif: buka backend Lovable Cloud → tab Authentication → buat user manual
-- Langkah promosi admin via SQL tetap sama tapi dengan penjelasan lebih jelas
-- Menyertakan langkah konfigurasi toko
-- Format profesional dengan emoji checklist dan bahasa yang ramah untuk pemula
-
-**2. Struktur plan.md baru:**
-
-```text
 # 🚀 Selamat Datang! Panduan Setup Setelah Remix
 
+Project ini adalah **toko online siap pakai**. Setelah remix, ikuti 3 langkah di bawah untuk mulai berjualan.
+
+---
+
 ## ✅ Yang Sudah Otomatis (Tidak Perlu Disentuh)
-- Database, tabel, RLS policies
-- Edge functions (dinamis)
-- SPA routing
+
+| Komponen | Status |
+|----------|--------|
+| Database (tabel, RLS, fungsi SQL) | ✅ Otomatis via migrasi |
+| Edge functions (`ogcard`, `sitemap`, `daily-activity`) | ✅ Dinamis, tidak perlu edit URL |
+| SPA routing (`_redirects`) | ✅ Sudah dikonfigurasi |
+| Secrets backend (`SUPABASE_URL`, `SUPABASE_ANON_KEY`) | ✅ Otomatis tersedia |
+
+---
 
 ## 🔐 Langkah 1: Buat Akun Admin
-- Ketik di chat Lovable: "Buatkan akun admin dengan email [email] dan password [password]"
-- Atau: buka backend → Authentication → Add User
 
-## 👑 Langkah 2: Promosikan ke Admin
-- Ketik di chat Lovable: "Jalankan SQL: INSERT INTO public.user_roles..."
-- Atau: buka backend → SQL Editor → jalankan query
+> ⚠️ **Tidak ada halaman signup di aplikasi ini** — ini memang disengaja (by design). Halaman `/pdidin` hanya untuk login.
 
-## 🏪 Langkah 3: Login & Konfigurasi Toko
-- Buka /pdidin → login → isi semua pengaturan
+**Cara buat akun:**
 
-## Checklist ringkas (tabel)
+Ketik perintah ini di chat Lovable:
+
+```
+Buatkan akun admin dengan email contoh@email.com dan password passwordku123
 ```
 
-### File yang Diubah
-- `.lovable/plan.md` — rewrite total
+Lovable AI akan otomatis membuatkan akun untuk kamu.
 
-### Tidak Ada Perubahan Kode
-Tidak ada perubahan di komponen React atau edge functions. Ini murni update dokumentasi.
+**Alternatif:** Buka backend Lovable Cloud → tab **Authentication** → klik **Add User** → isi email & password.
 
+---
+
+## 👑 Langkah 2: Promosikan ke Admin
+
+Setelah akun dibuat, kamu perlu menjadikannya admin agar bisa mengakses dashboard `/pdidin`.
+
+Ketik perintah ini di chat Lovable:
+
+```
+Jalankan SQL ini: INSERT INTO public.user_roles (user_id, role) VALUES ('<UUID_USER>', 'admin');
+```
+
+> 💡 Ganti `<UUID_USER>` dengan UUID akun yang baru dibuat. UUID bisa dilihat di tab Authentication backend.
+
+**Alternatif:** Buka backend Lovable Cloud → **SQL Editor** → jalankan query di atas.
+
+---
+
+## 🏪 Langkah 3: Login & Konfigurasi Toko
+
+1. Buka halaman `/pdidin`
+2. Login dengan akun yang sudah dibuat
+3. Isi semua pengaturan di **Global Settings**:
+   - 🏷️ Nama toko & deskripsi
+   - 🖼️ Logo toko
+   - 📱 Target checkout (WhatsApp/Telegram/link custom)
+   - 🔍 SEO (judul & deskripsi untuk Google)
+4. Mulai tambahkan produk!
+
+---
+
+## 📋 Checklist Ringkas
+
+| # | Langkah | Cara |
+|---|---------|------|
+| 1 | Buat akun | Chat Lovable / Backend Auth tab |
+| 2 | Jadikan admin | Chat Lovable / Backend SQL Editor |
+| 3 | Konfigurasi toko | Login ke `/pdidin` → Global Settings |
+
+---
+
+## 💡 Tips
+
+- Semua edge function (`ogcard`, `sitemap`) sudah **dinamis** — membaca nama toko & URL dari database secara otomatis
+- Edge function `daily-activity` adalah cron maintenance untuk menjaga database tetap aktif
+- Tidak perlu edit kode apapun untuk mulai menggunakan toko ini
