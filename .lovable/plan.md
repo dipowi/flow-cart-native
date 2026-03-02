@@ -75,5 +75,6 @@ Jalankan SQL ini: INSERT INTO public.user_roles (user_id, role) VALUES ('<UUID_U
 ## 💡 Tips
 
 - Semua edge function (`ogcard`, `sitemap`) sudah **dinamis** — membaca nama toko & URL dari database secara otomatis
-- Edge function `daily-activity` adalah cron maintenance untuk menjaga database tetap aktif
+- **Cron maintenance** (`daily-activity`) berjalan otomatis via database scheduler (setiap hari jam 05:00 UTC) — tidak perlu setup manual, sudah termasuk dalam migrasi
+- Halaman `/supabsen` menampilkan status sistem — jika cron berjalan, status akan menunjukkan "Active"
 - Tidak perlu edit kode apapun untuk mulai menggunakan toko ini
